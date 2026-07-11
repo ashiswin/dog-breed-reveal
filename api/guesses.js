@@ -119,5 +119,27 @@ export default async function handler(req, res) {
     }
   }
 
+  if (req.method === "GET" && url.pathname === "/api/status") {
+    const hasUrl = !!process.env.UPSTASH_REDIS_REST_URL;
+    const hasToken = !!process.env.UPSTASH_REDIS_REST_TOKEN;
+    const guesses = await getGuesses();
+    const answers = await getAnswers();
+    const revealed = await getRevealed();
+    return res.json({
+      redis: {
+        urlSet: hasUrl,
+        tokenSet: hasToken,
+        url: hasUrl ? process.env.UPSTASH_REDIS_REST_URL.slice(0, 40) + "..." : "MISSING",
+      },
+      data: {
+        guesses: guesses.length,
+        answersSet: !!answers,
+        revealed,
+        image1: !!(answers && answers.image1),
+        image2: !!(answers && answers.image2),
+      },
+    });
+  }
+
   return res.status(405).json({ error: "Method not allowed" });
 }
