@@ -4,7 +4,9 @@
   "installCommand": "npm install",
   "outputDirectory": null,
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/guesses" }
+    { "source": "/api/(.*)", "destination": "/api/guesses" },
+    { "source": "/qr", "destination": "/qr.html" },
+    { "source": "/splash", "destination": "/qr.html" }
   ],
   "functions": {
     "api/guesses.js": {

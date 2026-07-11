@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cast Your Vote! – Dog Breed Reveal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --gold: #F5A623; --brown: #8B5E3C; --cream: #FFF8E7;
+      --coral: #FF6B6B; --teal: #4ECDC4; --dark: #3D2B1F;
+    }
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: linear-gradient(160deg, #FFF8E7 0%, #FFECD2 40%, #FFF3E0 70%, #FFE8C8 100%);
+      min-height: 100vh; color: var(--dark); overflow-x: hidden;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .paw-bg { position: fixed; pointer-events: none; z-index: 0; opacity: 0.06; font-size: 70px; user-select: none; }
+    .paw-bg:nth-child(1) { top: 5%; left: 5%; transform: rotate(-15deg); }
+    .paw-bg:nth-child(2) { top: 15%; right: 8%; transform: rotate(25deg); font-size: 50px; }
+    .paw-bg:nth-child(3) { top: 40%; left: 3%; transform: rotate(10deg); font-size: 55px; }
+    .paw-bg:nth-child(4) { top: 60%; right: 5%; transform: rotate(-20deg); font-size: 48px; }
+    .paw-bg:nth-child(5) { bottom: 10%; left: 8%; transform: rotate(30deg); font-size: 40px; }
+    .paw-bg:nth-child(6) { bottom: 20%; right: 12%; transform: rotate(-10deg); font-size: 60px; }
+    .paw-bg:nth-child(7) { top: 30%; left: 40%; transform: rotate(5deg); font-size: 35px; }
+    .paw-bg:nth-child(8) { bottom: 40%; right: 30%; transform: rotate(-5deg); font-size: 42px; }
+
+    .splash-card {
+      position: relative; z-index: 1; text-align: center;
+      background: white; border-radius: 32px; padding: 48px 40px;
+      box-shadow: 0 8px 50px rgba(0,0,0,0.1); border: 4px dashed rgba(245,166,35,0.2);
+      max-width: 480px; margin: 20px;
+    }
+    .emoji-row {
+      font-size: 48px; margin-bottom: 8px;
+      animation: bounce 1.5s ease-in-out infinite alternate;
+    }
+    @keyframes bounce {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-10px); }
+    }
+    .title {
+      font-family: 'Fredoka One', cursive; font-size: 2.4rem;
+      color: var(--brown); line-height: 1.2; margin-bottom: 8px;
+    }
+    .subtitle {
+      font-size: 1.1rem; color: var(--brown); opacity: 0.7; margin-bottom: 28px;
+      font-weight: 600;
+    }
+    .qr-wrap {
+      display: inline-block; padding: 20px; background: white;
+      border-radius: 24px; box-shadow: 0 4px 30px rgba(0,0,0,0.08);
+      border: 3px solid #F0E0CC;
+    }
+    .qr-wrap img {
+      display: block; width: 260px; height: 260px;
+    }
+    .url-text {
+      margin-top: 20px; font-weight: 700; font-size: 1.05rem;
+      color: var(--teal); word-break: break-all;
+    }
+    .url-text a {
+      color: var(--teal); text-decoration: none;
+    }
+    .url-text a:hover { text-decoration: underline; }
+    .footer-note {
+      margin-top: 16px; font-size: 0.85rem; color: var(--brown); opacity: 0.5;
+    }
+    .nav-link {
+      display: inline-block; margin-top: 20px; padding: 8px 20px;
+      border-radius: 14px; text-decoration: none; font-weight: 700;
+      font-size: 0.85rem; color: var(--brown); background: rgba(245,166,35,0.1);
+      transition: all 0.2s;
+    }
+    .nav-link:hover { background: var(--gold); color: white; }
+
+    @media (max-width: 500px) {
+      .splash-card { padding: 32px 20px; }
+      .title { font-size: 1.8rem; }
+      .qr-wrap img { width: 200px; height: 200px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="paw-bg">🐾</div><div class="paw-bg">🐾</div><div class="paw-bg">🐾</div>
+  <div class="paw-bg">🐾</div><div class="paw-bg">🐾</div><div class="paw-bg">🐾</div>
+  <div class="paw-bg">🐾</div><div class="paw-bg">🐾</div>
+
+  <div class="splash-card">
+    <div class="emoji-row">🐶 🐕 🐩 🐕‍🦺</div>
+    <h1 class="title">Cast Your<br>Vote Here!</h1>
+    <p class="subtitle">Scan the QR code to guess the breeds</p>
+
+    <div class="qr-wrap">
+      <img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https%3A%2F%2Fdog-breed-reveal-delta.vercel.app%2F&margin=10" alt="QR code" width="300" height="300">
+    </div>
+
+    <p class="url-text">
+      <a href="https://dog-breed-reveal-delta.vercel.app/">dog-breed-reveal-delta.vercel.app</a>
+    </p>
+
+    <p class="footer-note">🐾 Open your camera and point it at the QR code</p>
+
+    <a href="/" class="nav-link">← Back to guessing</a>
+  </div>
+</body>
+</html>

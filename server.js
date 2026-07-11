@@ -12,6 +12,8 @@ app.use(express.static(path.join(__dirname, "public")));
 
 app.get("/admin", (req, res) => res.sendFile(path.join(__dirname, "public", "admin.html")));
 app.get("/slideshow", (req, res) => res.sendFile(path.join(__dirname, "public", "slideshow.html")));
+app.get("/qr", (req, res) => res.sendFile(path.join(__dirname, "public", "qr.html")));
+app.get("/splash", (req, res) => res.sendFile(path.join(__dirname, "public", "qr.html")));
 
 let guesses = [];
 let answers = null;
