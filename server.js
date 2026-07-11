@@ -1,11 +1,13 @@
 const express = require("express");
 const path = require("path");
+const fs = require("fs");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "woofletmein";
+const DATA_FILE = path.join(__dirname, "data.json");
 
-app.use(express.json());
+app.use(express.json({ limit: "10mb" }));
 app.use(express.static(path.join(__dirname, "public")));
 
 app.get("/admin", (req, res) => res.sendFile(path.join(__dirname, "public", "admin.html")));
@@ -14,6 +16,29 @@ app.get("/slideshow", (req, res) => res.sendFile(path.join(__dirname, "public", 
 let guesses = [];
 let answers = null;
 let revealed = false;
+
+function saveData() {
+  try {
+    fs.writeFileSync(DATA_FILE, JSON.stringify({ guesses, answers, revealed }, null, 2));
+  } catch (e) {
+    console.error("Failed to save data:", e.message);
+  }
+}
+
+function loadData() {
+  try {
+    if (fs.existsSync(DATA_FILE)) {
+      const raw = fs.readFileSync(DATA_FILE, "utf-8");
+      const data = JSON.parse(raw);
+      guesses = data.guesses || [];
+      answers = data.answers || null;
+      revealed = data.revealed || false;
+      console.log(`Loaded data: ${guesses.length} guesses, answers=${!!answers}, revealed=${revealed}`);
+    }
+  } catch (e) {
+    console.error("Failed to load data:", e.message);
+  }
+}
 
 function checkAuth(req, res, next) {
   const pw = req.headers["x-admin-password"];
@@ -69,6 +94,7 @@ app.post("/api/guesses", (req, res) => {
   };
 
   guesses.push(guess);
+  saveData();
   res.status(201).json(guess);
 });
 
@@ -77,6 +103,7 @@ app.delete("/api/guesses/:id", checkAuth, (req, res) => {
   const idx = guesses.findIndex(g => g.id === id);
   if (idx === -1) return res.status(404).json({ error: "Not found" });
   guesses.splice(idx, 1);
+  saveData();
   res.json({ ok: true });
 });
 
@@ -86,7 +113,7 @@ app.get("/api/answers", (req, res) => {
 });
 
 app.post("/api/answers", checkAuth, (req, res) => {
-  const { dog1, dog2 } = req.body;
+  const { dog1, dog2, image1, image2 } = req.body;
   if (!dog1 || !Array.isArray(dog1) || dog1.length === 0) {
     return res.status(400).json({ error: "At least one breed for Fifi" });
   }
@@ -103,8 +130,9 @@ app.post("/api/answers", checkAuth, (req, res) => {
   if (Math.abs(total1 - 100) > 0.5 || Math.abs(total2 - 100) > 0.5) {
     return res.status(400).json({ error: `Percentages must add up to 100%. Fifi: ${total1}%, Snowy: ${total2}%` });
   }
-  answers = { dog1: c1, dog2: c2 };
+  answers = { dog1: c1, dog2: c2, image1: image1 || null, image2: image2 || null };
   revealed = false;
+  saveData();
   res.json({ ok: true, answers });
 });
 
@@ -141,8 +169,11 @@ app.post("/api/reveal", checkAuth, (req, res) => {
   });
 
   revealed = true;
+  saveData();
   res.json({ ok: true, answers, guesses });
 });
+
+loadData();
 
 app.listen(PORT, () => {
   console.log(`Dog Breed Reveal server running at http://localhost:${PORT}`);

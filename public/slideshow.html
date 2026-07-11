@@ -122,26 +122,36 @@
     }
 
     .breed-reveal-area {
-      width: 100%; max-width: 550px; margin: 0 auto 10px;
+      display: flex; flex-direction: column; align-items: center; margin: 0 auto 10px;
     }
-    .embark-bar {
-      height: 70px; border-radius: 20px; overflow: hidden; display: flex;
-      box-shadow: 0 8px 40px rgba(0,0,0,0.35);
-      margin: 0 auto;
+    .photo-ring-wrap {
+      position: relative; width: 280px; height: 280px; margin: 0 auto;
+      animation: fadeInUp 0.8s both;
     }
-    .embark-segment {
-      height: 100%; display: flex; align-items: center; justify-content: center;
-      font-family: 'Fredoka One', cursive; font-size: 1.5rem;
-      color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-      overflow: hidden; white-space: nowrap;
-      animation: segmentGrow 1.2s ease-out both;
+    .photo-ring-wrap svg {
+      width: 100%; height: 100%;
     }
-    @keyframes segmentGrow {
-      0% { width: 0 !important; }
+    .photo-ring-wrap .photo-img,
+    .photo-ring-wrap .photo-placeholder {
+      animation: fadeIn 0.6s 0.3s both;
     }
-    .embark-segment.small { font-size: 1rem; }
+    .photo-ring-wrap .photo-img {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      width: 190px; height: 190px; border-radius: 50%; object-fit: cover;
+      border: 4px solid white; box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+    .photo-ring-wrap .photo-placeholder {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      width: 190px; height: 190px; border-radius: 50%;
+      background: rgba(255,255,255,0.08); border: 4px solid rgba(255,255,255,0.2);
+      display: flex; align-items: center; justify-content: center; font-size: 70px;
+    }
+    .ring-segment {
+      fill: none; stroke-width: 14;
+      transition: stroke-dashoffset 1.5s ease-out;
+    }
     .embark-labels {
-      display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; justify-content: center;
+      display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; justify-content: center;
     }
     .embark-label {
       display: flex; align-items: center; gap: 6px;
@@ -369,72 +379,107 @@
 
     const SEGMENT_COLORS = ["#4A90D9", "#7BC67E", "#F5A623", "#E87D7D", "#9B7ED8", "#4ECDC4"];
 
-    function renderEmbarkBar(breeds, animate = true) {
+    function renderPhotoRing(breeds, imageSrc, animate = true) {
       const area = document.createElement("div");
       area.className = "breed-reveal-area";
 
-      const bar = document.createElement("div");
-      bar.className = "embark-bar";
-      area.appendChild(bar);
+      const wrap = document.createElement("div");
+      wrap.className = "photo-ring-wrap";
 
+      // SVG ring
+      const r = 120; // radius of ring center
+      const sw = 14; // stroke width
+      const circumference = 2 * Math.PI * r;
+
+      let svg = `<svg viewBox="0 0 280 280"><g transform="rotate(-90 140 140)">`;
+
+      let offset = 0;
+      breeds.forEach((b, i) => {
+        const pct = typeof b === "string" ? Math.floor(100 / breeds.length) : (b.percentage || 0);
+        const dashLen = (pct / 100) * circumference;
+        const color = SEGMENT_COLORS[i % SEGMENT_COLORS.length];
+        const animOffset = animate ? circumference : -offset;
+        svg += `<circle cx="140" cy="140" r="${r}" class="ring-segment"
+          stroke="${color}" fill="none" stroke-width="${sw}"
+          stroke-dasharray="${dashLen} ${circumference}"
+          stroke-dashoffset="${animOffset}"
+          style="stroke-dashoffset: ${-offset};" />`;
+        offset += dashLen;
+      });
+
+      svg += `</g></svg>`;
+      wrap.innerHTML = svg;
+
+      // Photo
+      if (imageSrc) {
+        const img = document.createElement("img");
+        img.className = "photo-img";
+        img.src = imageSrc;
+        img.onerror = () => { img.remove(); wrap.appendChild(createPlaceholder()); };
+        wrap.appendChild(img);
+      } else {
+        wrap.appendChild(createPlaceholder());
+      }
+
+      area.appendChild(wrap);
+
+      function createPlaceholder() {
+        const ph = document.createElement("div");
+        ph.className = "photo-placeholder";
+        ph.textContent = "🐶";
+        return ph;
+      }
+
+      // Labels
       const labels = document.createElement("div");
       labels.className = "embark-labels";
-      area.appendChild(labels);
-
       breeds.forEach((b, i) => {
         const breed = typeof b === "string" ? b : b.breed;
         const pct = typeof b === "string" ? Math.floor(100 / breeds.length) : (b.percentage || 0);
         const color = SEGMENT_COLORS[i % SEGMENT_COLORS.length];
-
-        const seg = document.createElement("div");
-        seg.className = "embark-segment" + (pct < 25 ? " small" : "");
-        seg.style.width = animate ? "0%" : pct + "%";
-        seg.style.background = color;
-        seg.textContent = pct >= 12 ? pct + "%" : "";
-        seg.style.animationDelay = (i * 0.4) + "s";
-        if (!animate) seg.style.width = pct + "%";
-        bar.appendChild(seg);
-
         const label = document.createElement("div");
         label.className = "embark-label";
-        label.style.animationDelay = (i * 0.3 + 0.5) + "s";
+        label.style.animationDelay = (i * 0.3 + 0.6) + "s";
         label.innerHTML = `<span class="embark-dot" style="background:${color};"></span>${esc(breed)} <strong>${pct}%</strong>`;
         labels.appendChild(label);
       });
+      area.appendChild(labels);
+
+      // Animate: trigger the dashoffset transition
+      if (animate) {
+        requestAnimationFrame(() => {
+          const circles = wrap.querySelectorAll(".ring-segment");
+          let cumOffset = 0;
+          circles.forEach((c, i) => {
+            const pct = breeds[i].percentage || Math.floor(100 / breeds.length);
+            const dashLen = (pct / 100) * circumference;
+            c.style.strokeDashoffset = -cumOffset;
+            cumOffset += dashLen;
+          });
+        });
+      }
 
       return area;
     }
 
     // --- Dramatic breed reveal ---
-    async function revealBreeds(container, breeds, dogEmoji, dogName) {
+    async function revealBreeds(container, breeds, dogEmoji, dogName, imageSrc) {
       spotlight(true);
       sparkleBurst();
 
       const breedsArr = Array.isArray(breeds) ? breeds : [breeds];
 
       const titleHtml = `
-        <div class="reveal-dog-emoji">${dogEmoji}</div>
         <div class="reveal-title">${esc(dogName)} is a...</div>
       `;
       container.innerHTML = titleHtml;
       await wait(1000);
 
       confetti(40);
-      const area = renderEmbarkBar(breedsArr, true);
+      const area = renderPhotoRing(breedsArr, imageSrc, true);
       container.appendChild(area);
 
-      // Wait for animations to complete
-      const totalDelay = breedsArr.length * 400 + 1200;
-      await wait(totalDelay + 600);
-
-      // Trigger bar segments to fill
-      const segments = area.querySelectorAll(".embark-segment");
-      segments.forEach((seg, i) => {
-        const pct = breedsArr[i].percentage || Math.floor(100 / breedsArr.length);
-        seg.style.width = pct + "%";
-      });
-
-      await wait(600);
+      await wait(2000);
       spotlight(false);
     }
 
@@ -496,9 +541,9 @@
     }
 
     // --- Full dog reveal sequence ---
-    async function runDogReveal(container, breeds, dogEmoji, dogName, dogNum, nextLabel, onNext) {
+    async function runDogReveal(container, breeds, dogEmoji, dogName, dogNum, imageSrc, nextLabel, onNext) {
       container.innerHTML = "";
-      await revealBreeds(container, breeds, dogEmoji, dogName);
+      await revealBreeds(container, breeds, dogEmoji, dogName, imageSrc);
       await revealGuesses(container, allGuesses, dogNum);
       addNextButton(container, nextLabel, onNext);
     }
@@ -528,14 +573,14 @@
     async function showFifi() {
       showPhase("phase-fifi");
       const container = document.getElementById("fifi-content");
-      await runDogReveal(container, answers.dog1, "🐶", "Fifi", 1, "Next: Snowy →", showSnowy);
+      await runDogReveal(container, answers.dog1, "🐶", "Fifi", 1, answers.image1, "Next: Snowy →", showSnowy);
     }
 
     // --- Phase: Snowy ---
     async function showSnowy() {
       showPhase("phase-snowy");
       const container = document.getElementById("snowy-content");
-      await runDogReveal(container, answers.dog2, "🐩", "Snowy", 2, "See Full Results →", showSummary);
+      await runDogReveal(container, answers.dog2, "🐩", "Snowy", 2, answers.image2, "See Full Results →", showSummary);
     }
 
     // --- Phase: Summary ---
@@ -546,7 +591,6 @@
       const container = document.getElementById("summary-content");
 
       container.innerHTML = `
-        <div class="reveal-dog-emoji">🐾</div>
         <div class="reveal-title">The Results!</div>
       `;
       await wait(600);
@@ -556,13 +600,13 @@
       fifiTitle.style.cssText = "font-size:1.3rem;font-weight:700;opacity:0.7;margin-top:10px;";
       fifiTitle.textContent = "🐶 Fifi";
       container.appendChild(fifiTitle);
-      container.appendChild(renderEmbarkBar(answers.dog1, false));
+      container.appendChild(renderPhotoRing(answers.dog1, answers.image1, false));
 
       const snowyTitle = document.createElement("div");
       snowyTitle.style.cssText = "font-size:1.3rem;font-weight:700;opacity:0.7;margin-top:16px;";
       snowyTitle.textContent = "🐩 Snowy";
       container.appendChild(snowyTitle);
-      container.appendChild(renderEmbarkBar(answers.dog2, false));
+      container.appendChild(renderPhotoRing(answers.dog2, answers.image2, false));
       await wait(1000);
 
       const correct = allGuesses.filter(g => g.score === "correct").length;

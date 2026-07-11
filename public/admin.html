@@ -61,6 +61,14 @@
     .pct-bar-fill { height: 100%; border-radius: 4px; transition: width 0.3s, background 0.3s; }
     .pct-bar-fill.good { background: var(--green); }
     .pct-bar-fill.bad { background: var(--coral); }
+    .photo-section { margin: 10px 0 4px; }
+    .photo-label { font-size: 0.8rem; font-weight: 700; color: var(--brown); display: block; margin-bottom: 6px; }
+    .photo-inputs { display: flex; align-items: center; gap: 8px; }
+    .photo-inputs input[type="file"] { flex: 1; font-size: 0.8rem; }
+    .photo-inputs input[type="text"] { flex: 1; padding: 8px 12px; border: 2px solid #E8D5C4; border-radius: 10px; font-family: 'Nunito', sans-serif; font-size: 0.85rem; background: #FFFBF5; }
+    .photo-or { font-size: 0.8rem; color: #aaa; font-weight: 700; }
+    .photo-preview { width: 100%; max-width: 200px; height: 200px; object-fit: cover; border-radius: 14px; margin-top: 8px; border: 2px solid #f0e0cc; }
+    .photo-preview.hidden { display: none; }
     .add-breed-btn {
       display: inline-flex; align-items: center; gap: 4px; padding: 6px 14px;
       background: transparent; border: 2px dashed var(--gold); border-radius: 20px;
@@ -125,6 +133,15 @@
             <span id="pct-value1">0%</span>
             <div class="pct-bar-bg"><div class="pct-bar-fill" id="pct-bar1" style="width:0%"></div></div>
           </div>
+          <div class="photo-section">
+            <label class="photo-label">📸 Photo (optional)</label>
+            <div class="photo-inputs">
+              <input type="file" class="photo-file" data-dog="1" accept="image/*">
+              <span class="photo-or">or</span>
+              <input type="text" class="photo-url" data-dog="1" placeholder="Paste image URL...">
+            </div>
+            <img class="photo-preview hidden" id="photo-preview1" src="" alt="Fifi preview">
+          </div>
           <button class="add-breed-btn" id="addBreed1">+ Add breed</button>
         </div>
 
@@ -135,6 +152,15 @@
             <span>Total:</span>
             <span id="pct-value2">0%</span>
             <div class="pct-bar-bg"><div class="pct-bar-fill" id="pct-bar2" style="width:0%"></div></div>
+          </div>
+          <div class="photo-section">
+            <label class="photo-label">📸 Photo (optional)</label>
+            <div class="photo-inputs">
+              <input type="file" class="photo-file" data-dog="2" accept="image/*">
+              <span class="photo-or">or</span>
+              <input type="text" class="photo-url" data-dog="2" placeholder="Paste image URL...">
+            </div>
+            <img class="photo-preview hidden" id="photo-preview2" src="" alt="Snowy preview">
           </div>
           <button class="add-breed-btn" id="addBreed2">+ Add breed</button>
         </div>
@@ -294,7 +320,63 @@
       add(1, answers ? answers.dog1 : null);
       add(2, answers ? answers.dog2 : null);
       updateTotals();
+
+      // Load existing images
+      if (answers) {
+        loadPhotoPreview(1, answers.image1);
+        loadPhotoPreview(2, answers.image2);
+      }
     }
+
+    let photoData = { 1: null, 2: null };
+
+    function loadPhotoPreview(dog, src) {
+      const preview = document.getElementById(`photo-preview${dog}`);
+      if (src) {
+        photoData[dog] = src;
+        preview.src = src;
+        preview.classList.remove("hidden");
+      } else {
+        photoData[dog] = null;
+        preview.classList.add("hidden");
+        preview.src = "";
+      }
+    }
+
+    // File input handlers
+    document.querySelectorAll(".photo-file").forEach(input => {
+      input.addEventListener("change", () => {
+        const dog = input.dataset.dog;
+        const file = input.files[0];
+        if (!file) return;
+        if (file.size > 3 * 1024 * 1024) { alert("Image too large (max 3MB)"); return; }
+        const reader = new FileReader();
+        reader.onload = () => {
+          photoData[dog] = reader.result;
+          loadPhotoPreview(dog, reader.result);
+        };
+        reader.readAsDataURL(file);
+      });
+    });
+
+    // URL input handlers
+    document.querySelectorAll(".photo-url").forEach(input => {
+      input.addEventListener("input", () => {
+        const dog = input.dataset.dog;
+        const url = input.value.trim();
+        if (url) {
+          photoData[dog] = url;
+          loadPhotoPreview(dog, url);
+        } else {
+          // If they cleared the URL, check if a file was set
+          const fileInput = document.querySelector(`.photo-file[data-dog="${dog}"]`);
+          if (!fileInput.files.length) {
+            photoData[dog] = null;
+            loadPhotoPreview(dog, null);
+          }
+        }
+      });
+    });
 
     function addBreedRow(dog) {
       if (rows(dog) >= MAX_BREEDS) return;
@@ -323,7 +405,7 @@
       try {
         const res = await fetch("/api/answers", {
           method: "POST", headers: { "Content-Type": "application/json", "X-Admin-Password": adminPassword },
-          body: JSON.stringify({ dog1, dog2 }),
+          body: JSON.stringify({ dog1, dog2, image1: photoData[1], image2: photoData[2] }),
         });
         if (!res.ok) { alert((await res.json()).error); return; }
         const el = document.getElementById("answers-status");

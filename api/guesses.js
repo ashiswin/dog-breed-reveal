@@ -86,7 +86,7 @@ export default async function handler(req, res) {
   // --- Answers POST ---
   if (req.method === "POST" && url.pathname === "/api/answers") {
     if (!checkAuth(req.headers)) return res.status(401).json({ error: "Unauthorized" });
-    const { dog1, dog2 } = req.body;
+    const { dog1, dog2, image1, image2 } = req.body;
     if (!dog1 || !Array.isArray(dog1) || dog1.length === 0) {
       return res.status(400).json({ error: "At least one breed for Fifi" });
     }
@@ -103,7 +103,7 @@ export default async function handler(req, res) {
     if (Math.abs(total1 - 100) > 0.5 || Math.abs(total2 - 100) > 0.5) {
       return res.status(400).json({ error: `Percentages must add up to 100%. Fifi: ${total1}%, Snowy: ${total2}%` });
     }
-    const answers = await setAnswers(c1, c2);
+    const answers = await setAnswers(c1, c2, image1 || null, image2 || null);
     return res.json({ ok: true, answers });
   }
 
