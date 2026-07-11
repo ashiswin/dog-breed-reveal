@@ -15,6 +15,18 @@ export default async function handler(req, res) {
     return res.status(200).end();
   }
 
+  // Parse JSON body (Vercel doesn't do this automatically)
+  if (["POST", "PUT", "PATCH"].includes(req.method)) {
+    try {
+      const chunks = [];
+      for await (const chunk of req) chunks.push(chunk);
+      const raw = Buffer.concat(chunks).toString("utf-8");
+      req.body = raw ? JSON.parse(raw) : {};
+    } catch {
+      req.body = {};
+    }
+  }
+
   const url = new URL(req.url, `http://${req.headers.host}`);
 
   // --- Auth ---
