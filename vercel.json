@@ -3,10 +3,13 @@
   "devCommand": null,
   "installCommand": "npm install",
   "outputDirectory": null,
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/guesses" }
+  ],
   "functions": {
     "api/guesses.js": {
-      "memory": 128,
-      "maxDuration": 10
+      "memory": 256,
+      "maxDuration": 30
     }
   },
   "headers": [
@@ -14,8 +17,8 @@
       "source": "/api/(.*)",
       "headers": [
         { "key": "Access-Control-Allow-Origin", "value": "*" },
-        { "key": "Access-Control-Allow-Methods", "value": "GET, POST, OPTIONS" },
-        { "key": "Access-Control-Allow-Headers", "value": "Content-Type" }
+        { "key": "Access-Control-Allow-Methods", "value": "GET, POST, DELETE, OPTIONS" },
+        { "key": "Access-Control-Allow-Headers", "value": "Content-Type, X-Admin-Password" }
       ]
     }
   ]
