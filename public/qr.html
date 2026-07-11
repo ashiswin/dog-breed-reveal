@@ -14,8 +14,9 @@
     body {
       font-family: 'Nunito', sans-serif;
       background: linear-gradient(160deg, #FFF8E7 0%, #FFECD2 40%, #FFF3E0 70%, #FFE8C8 100%);
-      min-height: 100vh; color: var(--dark); overflow-x: hidden;
+      min-height: 100vh; color: var(--dark); overflow: hidden;
       display: flex; align-items: center; justify-content: center;
+      position: relative;
     }
     .paw-bg { position: fixed; pointer-events: none; z-index: 0; opacity: 0.06; font-size: 70px; user-select: none; }
     .paw-bg:nth-child(1) { top: 5%; left: 5%; transform: rotate(-15deg); }
@@ -28,7 +29,7 @@
     .paw-bg:nth-child(8) { bottom: 40%; right: 30%; transform: rotate(-5deg); font-size: 42px; }
 
     .splash-card {
-      position: relative; z-index: 1; text-align: center;
+      position: relative; z-index: 2; text-align: center;
       background: white; border-radius: 32px; padding: 48px 40px;
       box-shadow: 0 8px 50px rgba(0,0,0,0.1); border: 4px dashed rgba(245,166,35,0.2);
       max-width: 480px; margin: 20px;
@@ -61,13 +62,9 @@
       margin-top: 20px; font-weight: 700; font-size: 1.05rem;
       color: var(--teal); word-break: break-all;
     }
-    .url-text a {
-      color: var(--teal); text-decoration: none;
-    }
+    .url-text a { color: var(--teal); text-decoration: none; }
     .url-text a:hover { text-decoration: underline; }
-    .footer-note {
-      margin-top: 16px; font-size: 0.85rem; color: var(--brown); opacity: 0.5;
-    }
+    .footer-note { margin-top: 16px; font-size: 0.85rem; color: var(--brown); opacity: 0.5; }
     .nav-link {
       display: inline-block; margin-top: 20px; padding: 8px 20px;
       border-radius: 14px; text-decoration: none; font-weight: 700;
@@ -76,10 +73,78 @@
     }
     .nav-link:hover { background: var(--gold); color: white; }
 
+    /* Bouncing dog photos */
+    .bouncing-dog {
+      position: fixed; z-index: 1; pointer-events: none; user-select: none;
+      width: 130px; height: 130px; border-radius: 50%;
+      object-fit: cover; border: 4px solid white;
+      box-shadow: 0 6px 30px rgba(0,0,0,0.2);
+    }
+    .bouncing-dog.placeholder {
+      display: flex; align-items: center; justify-content: center;
+      font-size: 70px; background: rgba(245,166,35,0.1); border: 4px solid rgba(245,166,35,0.3);
+    }
+    .dog-label {
+      position: fixed; z-index: 1; pointer-events: none; user-select: none;
+      font-family: 'Fredoka One', cursive; font-size: 1.1rem;
+      color: var(--brown); text-align: center;
+      text-shadow: 0 2px 8px rgba(255,255,255,0.8);
+    }
+
+    /* Fifi bounces: irregular floaty motion */
+    @keyframes fifiFloat {
+      0%   { transform: translate(0, 0) rotate(-3deg) scale(1); }
+      15%  { transform: translate(-40px, -70px) rotate(5deg) scale(1.08); }
+      30%  { transform: translate(-80px, -20px) rotate(-8deg) scale(0.95); }
+      45%  { transform: translate(-30px, -90px) rotate(2deg) scale(1.05); }
+      60%  { transform: translate(-70px, -40px) rotate(-5deg) scale(0.92); }
+      75%  { transform: translate(-20px, -80px) rotate(8deg) scale(1.1); }
+      90%  { transform: translate(-60px, -10px) rotate(-2deg) scale(0.98); }
+      100% { transform: translate(0, 0) rotate(-3deg) scale(1); }
+    }
+
+    /* Snowy bounces: different timing and path */
+    @keyframes snowyFloat {
+      0%   { transform: translate(0, 0) rotate(2deg) scale(1); }
+      12%  { transform: translate(35px, -60px) rotate(-6deg) scale(1.07); }
+      25%  { transform: translate(70px, -30px) rotate(10deg) scale(0.93); }
+      38%  { transform: translate(50px, -85px) rotate(-3deg) scale(1.06); }
+      50%  { transform: translate(80px, -15px) rotate(4deg) scale(0.96); }
+      62%  { transform: translate(25px, -75px) rotate(-8deg) scale(1.09); }
+      75%  { transform: translate(60px, -50px) rotate(1deg) scale(0.94); }
+      88%  { transform: translate(40px, -70px) rotate(7deg) scale(1.04); }
+      100% { transform: translate(0, 0) rotate(2deg) scale(1); }
+    }
+
+    @keyframes fifiLabelFloat {
+      0%   { transform: translate(0, 0); }
+      15%  { transform: translate(-40px, -70px); }
+      30%  { transform: translate(-80px, -20px); }
+      45%  { transform: translate(-30px, -90px); }
+      60%  { transform: translate(-70px, -40px); }
+      75%  { transform: translate(-20px, -80px); }
+      90%  { transform: translate(-60px, -10px); }
+      100% { transform: translate(0, 0); }
+    }
+
+    @keyframes snowyLabelFloat {
+      0%   { transform: translate(0, 0); }
+      12%  { transform: translate(35px, -60px); }
+      25%  { transform: translate(70px, -30px); }
+      38%  { transform: translate(50px, -85px); }
+      50%  { transform: translate(80px, -15px); }
+      62%  { transform: translate(25px, -75px); }
+      75%  { transform: translate(60px, -50px); }
+      88%  { transform: translate(40px, -70px); }
+      100% { transform: translate(0, 0); }
+    }
+
     @media (max-width: 500px) {
       .splash-card { padding: 32px 20px; }
       .title { font-size: 1.8rem; }
       .qr-wrap img { width: 200px; height: 200px; }
+      .bouncing-dog { width: 80px; height: 80px; }
+      .bouncing-dog.placeholder { font-size: 45px; }
     }
   </style>
 </head>
@@ -87,6 +152,15 @@
   <div class="paw-bg">🐾</div><div class="paw-bg">🐾</div><div class="paw-bg">🐾</div>
   <div class="paw-bg">🐾</div><div class="paw-bg">🐾</div><div class="paw-bg">🐾</div>
   <div class="paw-bg">🐾</div><div class="paw-bg">🐾</div>
+
+  <!-- Bouncing dog photos -->
+  <img class="bouncing-dog" id="fifi-photo" src="" alt="Fifi" style="display:none;">
+  <div class="bouncing-dog placeholder" id="fifi-placeholder">🐶</div>
+  <div class="dog-label" id="fifi-label">Fifi</div>
+
+  <img class="bouncing-dog" id="snowy-photo" src="" alt="Snowy" style="display:none;">
+  <div class="bouncing-dog placeholder" id="snowy-placeholder">🐩</div>
+  <div class="dog-label" id="snowy-label">Snowy</div>
 
   <div class="splash-card">
     <div class="emoji-row">🐶 🐕 🐩 🐕‍🦺</div>
@@ -105,5 +179,75 @@
 
     <a href="/" class="nav-link">← Back to guessing</a>
   </div>
+
+  <script>
+    function positionDogs() {
+      const card = document.querySelector(".splash-card");
+      const rect = card.getBoundingClientRect();
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+
+      // Fifi: left side, vertically centered relative to card
+      const fifiLeft = Math.max(10, rect.left - 160);
+      const fifiTop = rect.top + rect.height / 2 - 65;
+      document.getElementById("fifi-photo").style.left = fifiLeft + "px";
+      document.getElementById("fifi-photo").style.top = fifiTop + "px";
+      document.getElementById("fifi-placeholder").style.left = fifiLeft + "px";
+      document.getElementById("fifi-placeholder").style.top = fifiTop + "px";
+      document.getElementById("fifi-label").style.left = (fifiLeft + 30) + "px";
+      document.getElementById("fifi-label").style.top = (fifiTop + 145) + "px";
+
+      // Snowy: right side
+      const snowyLeft = Math.min(vw - 170, rect.right + 30);
+      const snowyTop = rect.top + rect.height / 2 - 65;
+      document.getElementById("snowy-photo").style.left = snowyLeft + "px";
+      document.getElementById("snowy-photo").style.top = snowyTop + "px";
+      document.getElementById("snowy-placeholder").style.left = snowyLeft + "px";
+      document.getElementById("snowy-placeholder").style.top = snowyTop + "px";
+      document.getElementById("snowy-label").style.left = (snowyLeft + 30) + "px";
+      document.getElementById("snowy-label").style.top = (snowyTop + 145) + "px";
+    }
+
+    function applyAnimations() {
+      const fifiPhoto = document.getElementById("fifi-photo");
+      const fifiPlaceholder = document.getElementById("fifi-placeholder");
+      const fifiLabel = document.getElementById("fifi-label");
+      const snowyPhoto = document.getElementById("snowy-photo");
+      const snowyPlaceholder = document.getElementById("snowy-placeholder");
+      const snowyLabel = document.getElementById("snowy-label");
+
+      const duration = "6s";
+      fifiPhoto.style.animation = `fifiFloat ${duration} ease-in-out infinite`;
+      fifiPlaceholder.style.animation = `fifiFloat ${duration} ease-in-out infinite`;
+      fifiLabel.style.animation = `fifiLabelFloat ${duration} ease-in-out infinite`;
+      snowyPhoto.style.animation = `snowyFloat ${duration} ease-in-out infinite`;
+      snowyPlaceholder.style.animation = `snowyFloat ${duration} ease-in-out infinite`;
+      snowyLabel.style.animation = `snowyLabelFloat ${duration} ease-in-out infinite`;
+    }
+
+    async function loadPhotos() {
+      try {
+        const res = await fetch("/api/answers");
+        const data = await res.json();
+        if (data.answers) {
+          [1, 2].forEach(dog => {
+            const imgSrc = dog === 1 ? data.answers.image1 : data.answers.image2;
+            if (imgSrc) {
+              const photo = document.getElementById(dog === 1 ? "fifi-photo" : "snowy-photo");
+              const placeholder = document.getElementById(dog === 1 ? "fifi-placeholder" : "snowy-placeholder");
+              photo.src = imgSrc;
+              photo.style.display = "block";
+              placeholder.style.display = "none";
+            }
+          });
+        }
+      } catch {}
+    }
+
+    positionDogs();
+    applyAnimations();
+    loadPhotos();
+    window.addEventListener("resize", positionDogs);
+  </script>
 </body>
 </html>
