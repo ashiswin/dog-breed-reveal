@@ -4,7 +4,6 @@ const crypto = require("crypto");
 const https = require("https");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const { v4: uuidv4 } = require("uuid");
 const db = require("./lib/db");
 
 const app = express();
@@ -131,11 +130,11 @@ app.post("/api/parties", authMiddleware, async (req, res) => {
   const { dog1Name, dog2Name, slug } = req.body;
   if (!dog1Name || !dog2Name) return res.status(400).json({ error: "Both dog names required" });
   try {
-    const partySlug = (slug || dog1Name.toLowerCase().replace(/[^a-z0-9]/g, "-") + "-" + uuidv4().slice(0, 6)).toLowerCase().replace(/[^a-z0-9-]/g, "");
+    const partySlug = (slug || dog1Name.toLowerCase().replace(/[^a-z0-9]/g, "-") + "-" + crypto.randomUUID().slice(0, 6)).toLowerCase().replace(/[^a-z0-9-]/g, "");
     const existing = await db.getPartyBySlug(partySlug);
     if (existing) return res.status(400).json({ error: "Slug taken, try another" });
     const party = await db.createParty({
-      id: uuidv4(), slug: partySlug, userId: req.userId,
+      id: crypto.randomUUID(), slug: partySlug, userId: req.userId,
       dog1Name: dog1Name.trim(), dog2Name: dog2Name.trim(),
       createdAt: new Date().toISOString(),
     });
@@ -163,7 +162,7 @@ app.post("/api/parties/:slug/guesses", async (req, res) => {
   if (!dog1 || !Array.isArray(dog1) || dog1.length === 0) return res.status(400).json({ error: "At least one breed required" });
   if (!dog2 || !Array.isArray(dog2) || dog2.length === 0) return res.status(400).json({ error: "At least one breed required" });
   const guess = {
-    id: uuidv4().slice(0, 8),
+    id: crypto.randomUUID().slice(0, 8),
     name: name.trim(),
     dog1: dog1.filter(b => b && b.trim()).map(b => b.trim()),
     dog2: dog2.filter(b => b && b.trim()).map(b => b.trim()),
