@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard – Dog Breed Reveal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--gold:#F5A623;--brown:#8B5E3C;--coral:#FF6B6B;--teal:#4ECDC4;--green:#7BC67E;--dark:#3D2B1F}
+    body{font-family:'Nunito',sans-serif;background:#faf5ed;min-height:100vh;color:var(--dark)}
+    .container{max-width:700px;margin:0 auto;padding:20px}
+    .top-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px}
+    .top-bar h1{font-family:'Fredoka One',cursive;font-size:1.8rem;color:var(--brown)}
+    .top-bar .user-info{font-weight:700;color:var(--brown);opacity:.7}
+    .btn{padding:10px 20px;border:none;border-radius:14px;font-family:'Nunito',sans-serif;font-weight:700;font-size:.9rem;cursor:pointer;transition:transform .2s;text-decoration:none;display:inline-block}
+    .btn:hover{transform:translateY(-1px)}
+    .btn-primary{background:linear-gradient(135deg,var(--gold),#E8961A);color:white}
+    .btn-teal{background:var(--teal);color:white}
+    .btn-danger{background:var(--coral);color:white}
+    .btn-outline{background:transparent;border:2px solid #ccc;color:#888;padding:8px 16px}
+    .party-card{background:white;border-radius:18px;padding:20px 24px;box-shadow:0 4px 15px rgba(0,0,0,.06);margin-bottom:14px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+    .party-card .party-icon{font-size:36px;flex-shrink:0}
+    .party-info{flex:1;min-width:0}
+    .party-info h3{font-family:'Fredoka One',cursive;font-size:1.15rem;color:var(--brown);margin-bottom:2px}
+    .party-info .meta{font-size:.8rem;color:#999}
+    .party-actions{display:flex;gap:6px;flex-wrap:wrap}
+    .empty-state{text-align:center;padding:60px 20px;color:#bbb}
+    .empty-state .big{font-size:60px;display:block;margin-bottom:12px}
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:10;display:flex;align-items:center;justify-content:center;display:none}
+    .modal-overlay.active{display:flex}
+    .modal{background:white;border-radius:20px;padding:28px;max-width:400px;width:90%}
+    .modal h3{font-family:'Fredoka One',cursive;color:var(--brown);margin-bottom:16px}
+    .form-group{margin-bottom:14px}
+    .form-group label{display:block;font-weight:700;color:var(--brown);margin-bottom:4px;font-size:.85rem}
+    .form-group input{width:100%;padding:12px 16px;border:2px solid #E8D5C4;border-radius:12px;font-family:'Nunito',sans-serif;font-size:1rem;background:#FFFBF5}
+    .form-group input:focus{outline:none;border-color:var(--gold)}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="top-bar">
+      <h1>🐾 My Reveal Parties</h1>
+      <span class="user-info" id="userName"></span>
+      <button class="btn btn-outline" id="logoutBtn">Log out</button>
+    </div>
+    <button class="btn btn-primary" id="createBtn">＋ New Reveal Party</button>
+
+    <div id="partyList" style="margin-top:20px;"></div>
+  </div>
+
+  <!-- Create modal -->
+  <div class="modal-overlay" id="createModal">
+    <div class="modal">
+      <h3>Create New Party</h3>
+      <div class="form-group"><label>🐶 First Dog's Name</label><input type="text" id="dog1Name" placeholder="e.g. Fifi"></div>
+      <div class="form-group"><label>🐩 Second Dog's Name</label><input type="text" id="dog2Name" placeholder="e.g. Snowy"></div>
+      <div class="form-group"><label>Custom URL Slug (optional)</label><input type="text" id="partySlug" placeholder="e.g. my-party"></div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-primary" id="confirmCreate" style="flex:1;">Create</button>
+        <button class="btn btn-outline" id="cancelCreate" style="flex:1;">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const token = localStorage.getItem("token");
+    if (!token) window.location.href = "/";
+
+    const headers = { "Content-Type":"application/json", "Authorization": "Bearer " + token };
+
+    async function load() {
+      try {
+        const me = await fetch("/api/auth/me", { headers }).then(r => r.json());
+        document.getElementById("userName").textContent = me.name || me.email;
+
+        const parties = await fetch("/api/parties", { headers }).then(r => r.json());
+        const list = document.getElementById("partyList");
+        if (!parties.length) {
+          list.innerHTML = `<div class="empty-state"><span class="big">🎉</span><p>No parties yet! Create your first one above.</p></div>`;
+          return;
+        }
+        list.innerHTML = parties.map(p => `
+          <div class="party-card">
+            <div class="party-icon">🐶🐩</div>
+            <div class="party-info">
+              <h3>${esc(p.dog1Name)} & ${esc(p.dog2Name)}</h3>
+              <div class="meta">${p.guessCount} guesses · ${p.revealed ? 'Revealed' : 'Not revealed'} · ${p.slug}</div>
+            </div>
+            <div class="party-actions">
+              <a href="/p/${p.slug}" class="btn btn-teal">Guess</a>
+              <a href="/p/${p.slug}/admin" class="btn btn-primary">Admin</a>
+              <a href="/p/${p.slug}/slideshow" class="btn btn-teal">Reveal</a>
+              <a href="/p/${p.slug}/qr" class="btn btn-primary">QR</a>
+              <button class="btn btn-danger del-btn" data-slug="${p.slug}">🗑️</button>
+            </div>
+          </div>
+        `).join("");
+
+        list.querySelectorAll(".del-btn").forEach(b => b.addEventListener("click", async () => {
+          if (!confirm("Delete this party forever?")) return;
+          await fetch(`/api/parties/${b.dataset.slug}`, { method:"DELETE", headers });
+          load();
+        }));
+      } catch { window.location.href = "/"; }
+    }
+
+    load();
+
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      localStorage.removeItem("token"); window.location.href = "/";
+    });
+
+    document.getElementById("createBtn").addEventListener("click", () => {
+      document.getElementById("createModal").classList.add("active");
+    });
+    document.getElementById("cancelCreate").addEventListener("click", () => {
+      document.getElementById("createModal").classList.remove("active");
+    });
+    document.getElementById("confirmCreate").addEventListener("click", async () => {
+      const dog1Name = document.getElementById("dog1Name").value.trim();
+      const dog2Name = document.getElementById("dog2Name").value.trim();
+      const slug = document.getElementById("partySlug").value.trim();
+      if (!dog1Name || !dog2Name) return alert("Both dog names required");
+      const res = await fetch("/api/parties", {
+        method:"POST", headers, body: JSON.stringify({ dog1Name, dog2Name, slug: slug || undefined })
+      });
+      if (!res.ok) { alert((await res.json()).error); return; }
+      document.getElementById("createModal").classList.remove("active");
+      document.getElementById("dog1Name").value = "";
+      document.getElementById("dog2Name").value = "";
+      document.getElementById("partySlug").value = "";
+      load();
+    });
+
+    function esc(s) { const d = document.createElement("div"); d.textContent = s; return d.innerHTML; }
+  </script>
+</body>
+</html>

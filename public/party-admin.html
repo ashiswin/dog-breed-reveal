@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin – Dog Breed Reveal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--gold:#F5A623;--brown:#8B5E3C;--coral:#FF6B6B;--teal:#4ECDC4;--green:#7BC67E;--dark:#3D2B1F}
+    body{font-family:'Nunito',sans-serif;background:#faf5ed;min-height:100vh;color:var(--dark)}
+    .container{max-width:640px;margin:0 auto;padding:20px}
+    .top-nav{display:flex;gap:8px;margin:20px 0;flex-wrap:wrap}
+    .nav-link{padding:8px 16px;border-radius:12px;text-decoration:none;font-weight:700;font-size:.85rem;color:var(--brown);background:white;box-shadow:0 2px 10px rgba(0,0,0,.06)}
+    .nav-link:hover{background:var(--gold);color:white}
+    .nav-link.active{background:var(--gold);color:white}
+    .card{background:white;border-radius:20px;padding:24px;box-shadow:0 4px 15px rgba(0,0,0,.06);margin-bottom:16px}
+    .card h3{font-family:'Fredoka One',cursive;color:var(--brown);margin-bottom:12px}
+    .form-group{margin-bottom:14px}
+    .form-group label{display:block;font-weight:700;color:var(--brown);margin-bottom:6px;font-size:.9rem}
+    .form-group input,.form-group select{width:100%;padding:12px 16px;border:2px solid #E8D5C4;border-radius:12px;font-family:'Nunito',sans-serif;font-size:1rem;background:#FFFBF5}
+    .form-group input:focus,.form-group select:focus{outline:none;border-color:var(--gold)}
+    .dog-section{background:#FFFBF5;border:2px solid #F0E0CC;border-radius:14px;padding:16px;margin-bottom:12px}
+    .dog-section h4{font-family:'Fredoka One',cursive;color:var(--brown);font-size:1rem;margin-bottom:8px}
+    .breed-row{display:flex;align-items:center;gap:6px;margin-bottom:8px}
+    .breed-row .breed-select-wrap{flex:2.5}
+    .breed-row .pct-wrap{flex:.7}
+    .breed-row .pct-input{width:100%;padding:12px 8px;border:2px solid #E8D5C4;border-radius:12px;font-family:'Nunito',sans-serif;font-size:1rem;background:#FFFBF5;text-align:center}
+    .breed-row .pct-input:focus{outline:none;border-color:var(--gold)}
+    .pct-total{font-size:.85rem;font-weight:700;margin-top:4px;display:flex;align-items:center;gap:6px}
+    .pct-total.bad{color:var(--coral)}.pct-total.good{color:var(--green)}
+    .pct-bar-bg{flex:1;height:8px;background:#f0e0cc;border-radius:4px;overflow:hidden}
+    .pct-bar-fill{height:100%;border-radius:4px;transition:width .3s}
+    .pct-bar-fill.good{background:var(--green)}.pct-bar-fill.bad{background:var(--coral)}
+    .add-breed-btn{display:inline-flex;align-items:center;gap:4px;padding:6px 14px;background:transparent;border:2px dashed var(--gold);border-radius:20px;font-family:'Nunito',sans-serif;font-weight:700;font-size:.8rem;color:var(--gold);cursor:pointer}
+    .add-breed-btn:hover{background:rgba(245,166,35,.08)}
+    .add-breed-btn:disabled{opacity:.3}
+    .remove-breed-btn{width:30px;height:30px;border:none;background:#FFF0F0;color:var(--coral);border-radius:50%;font-size:1rem;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:700}
+    .remove-breed-btn:hover{background:var(--coral);color:white}
+    .photo-section{margin:10px 0 4px}
+    .photo-label{font-size:.8rem;font-weight:700;color:var(--brown);display:block;margin-bottom:6px}
+    .photo-inputs{display:flex;align-items:center;gap:8px}
+    .photo-inputs input[type=file]{flex:1;font-size:.8rem}
+    .photo-inputs input[type=text]{flex:1;padding:8px 12px;border:2px solid #E8D5C4;border-radius:10px;font-size:.85rem;background:#FFFBF5}
+    .photo-or{font-size:.8rem;color:#aaa;font-weight:700}
+    .photo-preview{width:100%;max-width:200px;height:200px;object-fit:cover;border-radius:14px;margin-top:8px;border:2px solid #f0e0cc}
+    .photo-preview.hidden{display:none}
+    .btn{padding:10px 20px;border:none;border-radius:14px;font-family:'Nunito',sans-serif;font-weight:700;font-size:.95rem;cursor:pointer;transition:transform .2s}
+    .btn:hover{transform:translateY(-1px)}
+    .btn-primary{width:100%;background:linear-gradient(135deg,var(--gold),#E8961A);color:white;box-shadow:0 4px 15px rgba(245,166,35,.3)}
+    .btn-danger{background:var(--coral);color:white}
+    .btn-small{padding:5px 12px;font-size:.75rem;border-radius:10px}
+    .status-msg{font-size:.85rem;margin-bottom:10px}
+    .admin-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid #f0e0cc}
+    .admin-row:last-child{border-bottom:none}
+    .admin-info{flex:1;min-width:0}
+    .admin-name{font-weight:800;font-size:.9rem}
+    .admin-breeds{font-size:.78rem;color:#888}
+    .hidden{display:none!important}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="top-nav">
+      <a href="/dashboard" class="nav-link">← Dashboard</a>
+      <span class="nav-link active">Admin</span>
+      <a href="#" class="nav-link" id="nav-slideshow">🎉 Slideshow</a>
+      <a href="#" class="nav-link" id="nav-qr">QR</a>
+      <a href="#" class="nav-link" id="nav-guess">Guess Page</a>
+    </div>
+
+    <div class="card">
+      <h3>🎯 Set Correct Breeds & Percentages</h3>
+      <div class="status-msg" id="answers-status"></div>
+
+      <div class="dog-section">
+        <h4>🐶 <span id="dog1Name">Dog 1</span></h4>
+        <div id="admin-dog1-breeds"></div>
+        <div class="pct-total" id="pct-total1"><span>Total:</span><span id="pct-value1">0%</span><div class="pct-bar-bg"><div class="pct-bar-fill" id="pct-bar1" style="width:0%"></div></div></div>
+        <div class="photo-section">
+          <label class="photo-label">📸 Photo (optional)</label>
+          <div class="photo-inputs"><input type="file" class="photo-file" data-dog="1" accept="image/*"><span class="photo-or">or</span><input type="text" class="photo-url" data-dog="1" placeholder="Paste image URL..."></div>
+          <img class="photo-preview hidden" id="photo-preview1" src="" alt="Preview">
+        </div>
+        <button class="add-breed-btn" id="addBreed1">+ Add breed</button>
+      </div>
+
+      <div class="dog-section">
+        <h4>🐩 <span id="dog2Name">Dog 2</span></h4>
+        <div id="admin-dog2-breeds"></div>
+        <div class="pct-total" id="pct-total2"><span>Total:</span><span id="pct-value2">0%</span><div class="pct-bar-bg"><div class="pct-bar-fill" id="pct-bar2" style="width:0%"></div></div></div>
+        <div class="photo-section">
+          <label class="photo-label">📸 Photo (optional)</label>
+          <div class="photo-inputs"><input type="file" class="photo-file" data-dog="2" accept="image/*"><span class="photo-or">or</span><input type="text" class="photo-url" data-dog="2" placeholder="Paste image URL..."></div>
+          <img class="photo-preview hidden" id="photo-preview2" src="" alt="Preview">
+        </div>
+        <button class="add-breed-btn" id="addBreed2">+ Add breed</button>
+      </div>
+
+      <button class="btn btn-primary" id="save-answers-btn">💾 Save Answers</button>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <h3 style="margin-bottom:0;">🗑️ Manage Guesses</h3>
+        <button class="btn btn-primary btn-small" id="refresh-btn">🔄 Refresh</button>
+      </div>
+      <div id="guesses-list"></div>
+    </div>
+  </div>
+
+  <script>
+    const slug = window.location.pathname.split("/p/")[1]?.split("/")[0];
+    const API = `/api/parties/${slug}`;
+    const token = localStorage.getItem("token");
+    const authHeaders = { "Content-Type":"application/json", "Authorization": "Bearer " + token };
+
+    document.getElementById("nav-slideshow").href = `/p/${slug}/slideshow`;
+    document.getElementById("nav-qr").href = `/p/${slug}/qr`;
+    document.getElementById("nav-guess").href = `/p/${slug}`;
+
+    const BREEDS = ["","Affenpinscher","Afghan Hound","Airedale Terrier","Akita","Alaskan Malamute","American Bulldog","American Cocker Spaniel","Australian Cattle Dog","Australian Shepherd","Basenji","Basset Hound","Beagle","Bearded Collie","Belgian Malinois","Bernese Mountain Dog","Bichon Frise","Bloodhound","Border Collie","Boston Terrier","Boxer","Brittany","Bulldog","Bullmastiff","Cairn Terrier","Cane Corso","Cavalier King Charles Spaniel","Chihuahua","Chinese Crested","Chow Chow","Cocker Spaniel","Collie","Corgi (Pembroke Welsh)","Corgi (Cardigan Welsh)","Dachshund","Dalmatian","Doberman Pinscher","English Bulldog","English Springer Spaniel","French Bulldog","German Shepherd","German Shorthaired Pointer","Golden Retriever","Gordon Setter","Great Dane","Great Pyrenees","Greyhound","Havanese","Irish Setter","Irish Wolfhound","Italian Greyhound","Jack Russell Terrier","Japanese Chin","Keeshond","Labrador Retriever","Leonberger","Lhasa Apso","Maltese","Mastiff","Miniature Pinscher","Miniature Schnauzer","Newfoundland","Norfolk Terrier","Norwegian Elkhound","Old English Sheepdog","Papillon","Pekingese","Pit Bull Terrier","Pointer","Pomeranian","Poodle","Portuguese Water Dog","Pug","Rhodesian Ridgeback","Rottweiler","Saint Bernard","Saluki","Samoyed","Schipperke","Scottish Terrier","Shar-Pei","Shetland Sheepdog","Shiba Inu","Shih Tzu","Siberian Husky","Silky Terrier","Staffordshire Bull Terrier","Vizsla","Weimaraner","Welsh Springer Spaniel","Welsh Terrier","West Highland White Terrier","Whippet","Wire Fox Terrier","Yorkshire Terrier","Mixed Breed / Mutt","Other"];
+    const FILTERED = BREEDS.filter(b => b);
+    const MAX_BREEDS = 4;
+    let photoData = { 1: null, 2: null };
+
+    function breedSelect(sel) {
+      const s = document.createElement("select");
+      s.innerHTML = FILTERED.map(b => `<option value="${b}" ${b===sel?"selected":""}>${b}</option>`).join("");
+      return s;
+    }
+    function breedRow(dog, i, breed, pct) {
+      const d = document.createElement("div"); d.className = "breed-row";
+      d.innerHTML = `<div class="form-group breed-select-wrap" style="margin-bottom:0;"></div><div class="form-group pct-wrap" style="margin-bottom:0;"><input type="number" class="pct-input" value="${pct||0}" min="0" max="100" placeholder="%"></div>${i>0?'<button class="remove-breed-btn">×</button>':'<span style="width:30px;flex-shrink:0;"></span>'}`;
+      d.querySelector(".breed-select-wrap").appendChild(breedSelect(breed||""));
+      const rm = d.querySelector(".remove-breed-btn");
+      if (rm) rm.addEventListener("click", () => { d.remove(); updateTotals(); });
+      d.querySelector("select").addEventListener("change", () => { if (rows(dog)===1) autoDistribute(dog); updateTotals(); });
+      d.querySelector(".pct-input").addEventListener("input", updateTotals);
+      return d;
+    }
+    function rows(d) { return document.querySelectorAll(`#admin-dog${d}-breeds .breed-row`).length }
+    function collect(d) { return Array.from(document.querySelectorAll(`#admin-dog${d}-breeds .breed-row`)).map(r=>({breed:r.querySelector("select").value,percentage:parseInt(r.querySelector(".pct-input").value)||0})).filter(b=>b.breed) }
+    function autoDistribute(d) {
+      const els = document.querySelectorAll(`#admin-dog${d}-breeds .breed-row`);
+      const sel = Array.from(els).filter(r => r.querySelector("select").value);
+      if (!sel.length) return;
+      const each = Math.floor(100/sel.length), rem = 100 - each*sel.length;
+      let idx = 0;
+      els.forEach(r => { if (r.querySelector("select").value) { r.querySelector(".pct-input").value = each + (idx===0?rem:0); idx++; } else { r.querySelector(".pct-input").value = 0; } });
+      updateTotals();
+    }
+    function updateTotals() {
+      [1,2].forEach(d => {
+        const data = collect(d), total = data.reduce((s,b)=>s+b.percentage,0);
+        document.getElementById(`pct-value${d}`).textContent = total + "%";
+        const bar = document.getElementById(`pct-bar${d}`);
+        bar.style.width = Math.min(total,100) + "%";
+        const good = Math.abs(total-100) <= 0.5;
+        document.getElementById(`pct-total${d}`).className = "pct-total " + (good?"good":"bad");
+        bar.className = "pct-bar-fill " + (good?"good":"bad");
+      });
+    }
+    function loadAnswers(answers) {
+      document.getElementById("admin-dog1-breeds").innerHTML = ""; document.getElementById("admin-dog2-breeds").innerHTML = "";
+      [1,2].forEach(d => {
+        const c = document.getElementById(`admin-dog${d}-breeds`);
+        const data = answers ? answers[`dog${d}`] : null;
+        if (data && data.length) data.forEach((b,i) => c.appendChild(breedRow(d,i,b.breed,b.percentage)));
+        if (rows(d)===0) { c.appendChild(breedRow(d,0)); autoDistribute(d); }
+        document.getElementById(`addBreed${d}`).disabled = rows(d) >= MAX_BREEDS;
+      });
+      updateTotals();
+      if (answers) { photoData[1] = answers.image1; photoData[2] = answers.image2; }
+      loadPhotoPreview(1, photoData[1]); loadPhotoPreview(2, photoData[2]);
+    }
+    function loadPhotoPreview(dog, src) {
+      const p = document.getElementById(`photo-preview${dog}`);
+      if (src) { p.src = src; p.classList.remove("hidden"); } else { p.classList.add("hidden"); p.src = ""; }
+    }
+    function addBreedRow(d) {
+      if (rows(d) >= MAX_BREEDS) return;
+      document.getElementById(`admin-dog${d}-breeds`).appendChild(breedRow(d, rows(d)));
+      autoDistribute(d);
+      document.getElementById(`addBreed${d}`).disabled = rows(d) >= MAX_BREEDS;
+      updateTotals();
+    }
+    document.getElementById("addBreed1").addEventListener("click", ()=>addBreedRow(1));
+    document.getElementById("addBreed2").addEventListener("click", ()=>addBreedRow(2));
+    loadAnswers(null);
+
+    document.querySelectorAll(".photo-file").forEach(i => i.addEventListener("change", () => {
+      const d = i.dataset.dog, f = i.files[0];
+      if (!f) return;
+      if (f.size > 3*1024*1024) { alert("Max 3MB"); return; }
+      const r = new FileReader();
+      r.onload = () => { photoData[d] = r.result; loadPhotoPreview(d, r.result); };
+      r.readAsDataURL(f);
+    }));
+    document.querySelectorAll(".photo-url").forEach(i => i.addEventListener("input", () => {
+      const d = i.dataset.dog, url = i.value.trim();
+      if (url) { photoData[d] = url; loadPhotoPreview(d, url); }
+    }));
+
+    document.getElementById("save-answers-btn").addEventListener("click", async () => {
+      const d1=collect(1),d2=collect(2);
+      if(!d1.length)return alert("Set at least one breed");
+      if(!d2.length)return alert("Set at least one breed");
+      const t1=d1.reduce((s,b)=>s+b.percentage,0),t2=d2.reduce((s,b)=>s+b.percentage,0);
+      if(Math.abs(t1-100)>.5||Math.abs(t2-100)>.5)return alert(`Must sum to 100%`);
+      const res=await fetch(`${API}/answers`,{method:"POST",headers:authHeaders,body:JSON.stringify({dog1:d1,dog2:d2,image1:photoData[1],image2:photoData[2]})});
+      if(!res.ok){alert((await res.json()).error);return}
+      document.getElementById("answers-status").innerHTML='<span style="color:var(--green);font-weight:700;">✅ Saved!</span>';
+      setTimeout(()=>document.getElementById("answers-status").innerHTML="",3000);
+    });
+
+    async function loadPanel() {
+      try {
+        const ar = await fetch(`${API}/answers`,{headers:authHeaders}).then(r=>r.json());
+        loadAnswers(ar.answers);
+      } catch {}
+      loadGuesses();
+    }
+    async function loadGuesses() {
+      const list = document.getElementById("guesses-list");
+      try {
+        const data = await fetch(`${API}/guesses`).then(r=>r.json());
+        const g = data.guesses||[];
+        if(!g.length){list.innerHTML='<p style="color:#888;text-align:center;padding:10px;">No guesses yet.</p>';return}
+        list.innerHTML = g.map(gg=>`<div class="admin-row"><div class="admin-info"><div class="admin-name">${esc(gg.name)}</div><div class="admin-breeds">Dog 1: ${gg.dog1.join(", ")} | Dog 2: ${gg.dog2.join(", ")}</div></div><button class="btn btn-danger btn-small del-btn" data-id="${gg.id}">🗑️</button></div>`).join("");
+        list.querySelectorAll(".del-btn").forEach(b=>b.addEventListener("click",async()=>{if(!confirm("Delete?"))return;await fetch(`${API}/guesses/${b.dataset.id}`,{method:"DELETE",headers:authHeaders});loadGuesses()}));
+      } catch { list.innerHTML = '<p style="color:#888;">Could not load.</p>'; }
+    }
+    document.getElementById("refresh-btn").addEventListener("click", loadGuesses);
+    loadPanel();
+
+    function esc(s) { const d = document.createElement("div"); d.textContent = s; return d.innerHTML; }
+  </script>
+</body>
+</html>
