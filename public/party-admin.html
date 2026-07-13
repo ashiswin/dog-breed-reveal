@@ -34,8 +34,12 @@ body{font-family:'Nunito',sans-serif;background:#faf5ed;min-height:100vh;color:#
 .rmb{width:28px;height:28px;border:none;background:#FFF0F0;color:#FF6B6B;border-radius:50%;font-size:.9rem;cursor:pointer;font-weight:700;display:flex;align-items:center;justify-content:center}
 .rmb:hover{background:#FF6B6B;color:white}
 .phs{margin:10px 0 4px}.phl{font-size:.8rem;font-weight:700;color:#8B5E3C;display:block;margin-bottom:6px}
-.phi{display:flex;align-items:center;gap:8px}.phi input[type=file]{flex:1;font-size:.8rem}
-.phi input[type=text]{flex:1;padding:8px 12px;border:2px solid #E8D5C4;border-radius:10px;font-size:.85rem;background:#FFFBF5}
+.phi{display:flex;align-items:center;gap:8px}
+.phi .btn-file{position:relative;overflow:hidden;cursor:pointer;background:#4ECDC4;color:white;padding:8px 16px;border-radius:12px;font-weight:700;font-size:.85rem;border:none;display:inline-flex;align-items:center;gap:6px;transition:transform .2s,box-shadow .2s;box-shadow:0 4px 15px rgba(78,205,196,.3)}
+.phi .btn-file:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(78,205,196,.5)}
+.phi .btn-file svg{width:16px;height:16px}
+.phi .btn-file input[type=file]{position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:pointer}
+.phi .purl{flex:1;padding:8px 12px;border:2px solid #E8D5C4;border-radius:10px;font-size:.85rem;background:#FFFBF5}
 .phor{font-size:.8rem;color:#aaa;font-weight:700}
 .pv{max-width:200px;height:200px;object-fit:cover;border-radius:14px;margin-top:8px;border:2px solid #f0e0cc;display:none}
 .pv.show{display:block}
@@ -172,7 +176,7 @@ function makedog(dog, i, existing) {
   block.innerHTML += "<div class=\"pt\"><span>Total:</span><span class=\"tv\">0%</span><div class=\"pb\"><div class=\"pf\" style=\"width:0%\"></div></div></div>";
 
   var ps = document.createElement("div"); ps.className = "phs";
-  ps.innerHTML = "<label class=\"phl\">📸 Photo (optional)</label><div class=\"phi\"><input type=\"file\" class=\"pfile\" accept=\"image/*\"><span class=\"phor\">or</span><input type=\"text\" class=\"purl\" placeholder=\"Paste image URL...\"></div><img class=\"pv\" src=\"\" alt=\"Preview\">";
+  ps.innerHTML = "<label class=\"phl\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" style=\"width:14px;height:14px;vertical-align:middle\"><rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\" ry=\"2\"/><circle cx=\"8.5\" cy=\"8.5\" r=\"1.5\"/><polyline points=\"21 15 16 10 5 21\"/></svg> Photo (optional)</label><div class=\"phi\"><span class=\"btn-file\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4\"/><polyline points=\"17 8 12 3 7 8\"/><line x1=\"12\" y1=\"3\" x2=\"12\" y2=\"15\"/></svg> Upload<input type=\"file\" class=\"pfile\" accept=\"image/*\"></span><span class=\"phor\">or</span><input type=\"text\" class=\"purl\" placeholder=\"Paste image URL...\"></div><img class=\"pv\" src=\"\" alt=\"Preview\">";
   block.appendChild(ps);
 
   if (existing && existing.image) {
