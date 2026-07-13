@@ -82,7 +82,7 @@ app.get("/api/auth/me", authMiddleware, async (req, res) => {
 app.get("/api/debug", async (req, res) => {
   const raw = await db.rawQuery("parties");
   const ins = await db.rawInsert("parties", {
-    id: "debug-" + Date.now(),
+    id: crypto.randomUUID(),
     slug: "debug-test",
     user_id: "00000000-0000-0000-0000-000000000000",
     dogs: [{ name: "DebugTest" }],
