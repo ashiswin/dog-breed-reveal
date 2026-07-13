@@ -1,7 +1,8 @@
 const express = require("express");
 const path = require("path");
-const crypto = require("crypto");
+const fs = require("fs");
 const https = require("https");
+const crypto = require("crypto");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const db = require("./lib/db");
@@ -19,34 +20,28 @@ app.use(express.static(path.join(__dirname, "public")));
 function authMiddleware(req, res, next) {
   const auth = req.headers.authorization;
   if (!auth || !auth.startsWith("Bearer ")) return res.status(401).json({ error: "Unauthorized" });
-  try {
-    req.userId = jwt.verify(auth.slice(7), JWT_SECRET).userId;
-    next();
-  } catch { return res.status(401).json({ error: "Invalid token" }); }
+  try { req.userId = jwt.verify(auth.slice(7), JWT_SECRET).userId; next(); }
+  catch { return res.status(401).json({ error: "Invalid token" }); }
 }
 
 async function partyAuth(req, res, next) {
   authMiddleware(req, res, async () => {
-    const party = await db.getPartyBySlug(req.params.slug);
-    if (!party || party.user_id !== req.userId) return res.status(403).json({ error: "Not your party" });
-    req.partySlug = req.params.slug;
+    const p = await db.getPartyBySlug(req.params.slug);
+    if (!p || p.user_id !== req.userId) return res.status(403).json({ error: "Not your party" });
     next();
   });
 }
 
-// --- Auth Routes ---
 app.post("/api/auth/register", async (req, res) => {
   const { email, password, name } = req.body;
-  if (!email || !password || !name) return res.status(400).json({ error: "Email, password, and name required" });
-  if (password.length < 6) return res.status(400).json({ error: "Password must be at least 6 characters" });
+  if (!email || !password || !name) return res.status(400).json({ error: "All fields required" });
+  if (password.length < 6) return res.status(400).json({ error: "Password too short" });
   try {
-    const existing = await db.findUserByEmail(email.toLowerCase());
-    if (existing) return res.status(400).json({ error: "Email already registered" });
-    const hash = await bcrypt.hash(password, 10);
-    const user = await db.createUser({ email: email.toLowerCase(), name: name.trim(), password: hash, googleId: null });
+    if (await db.findUserByEmail(email.toLowerCase())) return res.status(400).json({ error: "Email taken" });
+    const user = await db.createUser({ email: email.toLowerCase(), name: name.trim(), password: await bcrypt.hash(password, 10) });
     const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: "30d" });
     res.json({ token, user: { id: user.id, email: user.email, name: user.name } });
-  } catch (e) { res.status(500).json({ error: "Server error" }); }
+  } catch { res.status(500).json({ error: "Server error" }); }
 });
 
 app.post("/api/auth/login", async (req, res) => {
@@ -54,147 +49,97 @@ app.post("/api/auth/login", async (req, res) => {
   if (!email || !password) return res.status(400).json({ error: "Email and password required" });
   try {
     const user = await db.findUserByEmail(email.toLowerCase());
-    if (!user || !user.password) return res.status(401).json({ error: "Invalid credentials" });
-    const valid = await bcrypt.compare(password, user.password);
-    if (!valid) return res.status(401).json({ error: "Invalid credentials" });
+    if (!user || !user.password || !(await bcrypt.compare(password, user.password))) return res.status(401).json({ error: "Invalid credentials" });
     const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: "30d" });
     res.json({ token, user: { id: user.id, email: user.email, name: user.name } });
-  } catch (e) { res.status(500).json({ error: "Server error" }); }
-});
-
-// Google OAuth (manual, no passport)
-app.get("/api/auth/google", (req, res) => {
-  if (!GOOGLE_CLIENT_ID) return res.redirect("/");
-  const redirectUri = `${BASE_URL}/api/auth/google/callback`;
-  const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${encodeURIComponent("profile email")}&access_type=offline&prompt=consent`;
-  res.redirect(url);
-});
-
-app.get("/api/auth/google/callback", async (req, res) => {
-  const { code } = req.query;
-  if (!code) return res.redirect("/");
-
-  try {
-    // Exchange code for tokens
-    const tokenData = await postForm("https://oauth2.googleapis.com/token", {
-      code, client_id: GOOGLE_CLIENT_ID, client_secret: GOOGLE_CLIENT_SECRET,
-      redirect_uri: `${BASE_URL}/api/auth/google/callback`, grant_type: "authorization_code",
-    });
-    const accessToken = JSON.parse(tokenData).access_token;
-
-    // Get user info
-    const userData = await httpGet(`https://www.googleapis.com/oauth2/v2/userinfo`, {
-      Authorization: `Bearer ${accessToken}`,
-    });
-    const profile = JSON.parse(userData);
-
-    let user = await db.findUserByGoogleId(profile.id);
-    if (!user) {
-      user = await db.findUserByEmail(profile.email);
-      if (user) { await db.updateUserGoogleId(user.id, profile.id); }
-      else {
-        user = await db.createUser({ email: profile.email, name: profile.name || profile.email, password: null, googleId: profile.id });
-      }
-    }
-
-    const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: "30d" });
-    res.redirect(`/dashboard?token=${token}`);
-  } catch (e) {
-    res.redirect("/?error=google_auth_failed");
-  }
-});
-
-app.get("/api/auth/me", authMiddleware, async (req, res) => {
-  try {
-    const user = await db.getUserById(req.userId);
-    if (!user) return res.status(404).json({ error: "User not found" });
-    res.json({ id: user.id, email: user.email, name: user.name });
   } catch { res.status(500).json({ error: "Server error" }); }
 });
 
-// --- Party Routes ---
-app.get("/api/parties", authMiddleware, async (req, res) => {
+app.get("/api/auth/google", (req, res) => {
+  if (!GOOGLE_CLIENT_ID) return res.redirect("/");
+  res.redirect(`https://accounts.google.com/o/oauth2/v2/auth?client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${encodeURIComponent(BASE_URL+"/api/auth/google/callback")}&response_type=code&scope=${encodeURIComponent("profile email")}&access_type=offline&prompt=consent`);
+});
+
+app.get("/api/auth/google/callback", async (req, res) => {
+  const { code } = req.query; if (!code) return res.redirect("/");
   try {
-    const parties = await db.getPartiesByUser(req.userId);
-    res.json(parties.map(p => ({
-      id: p.id, slug: p.slug, userId: p.user_id,
-      dog1Name: p.dog1_name, dog2Name: p.dog2_name,
-      guessCount: (p.guesses || []).length,
-      revealed: p.revealed || false,
-      createdAt: p.created_at,
-    })));
-  } catch { res.json([]); }
+    const td = await postForm("https://oauth2.googleapis.com/token", { code, client_id: GOOGLE_CLIENT_ID, client_secret: GOOGLE_CLIENT_SECRET, redirect_uri: BASE_URL+"/api/auth/google/callback", grant_type: "authorization_code" });
+    const at = JSON.parse(td).access_token;
+    const profile = JSON.parse(await httpGet("https://www.googleapis.com/oauth2/v2/userinfo", { Authorization: "Bearer "+at }));
+    let user = await db.findUserByGoogleId(profile.id) || await db.findUserByEmail(profile.email);
+    if (user && !user.google_id) await db.updateUserGoogleId(user.id, profile.id);
+    else if (!user) user = await db.createUser({ email: profile.email, name: profile.name || profile.email, password: null, googleId: profile.id });
+    res.redirect(`/dashboard?token=${jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: "30d" })}`);
+  } catch { res.redirect("/"); }
+});
+
+app.get("/api/auth/me", authMiddleware, async (req, res) => {
+  const u = await db.getUserById(req.userId);
+  u ? res.json({ id: u.id, email: u.email, name: u.name }) : res.status(404).json({ error: "Not found" });
+});
+
+// --- Parties ---
+app.get("/api/parties", authMiddleware, async (req, res) => {
+  const parties = await db.getPartiesByUser(req.userId);
+  res.json(parties.map(p => ({ id: p.id, slug: p.slug, dogs: p.dogs || [], guessCount: (p.guesses||[]).length, revealed: p.revealed||false, createdAt: p.created_at })));
 });
 
 app.post("/api/parties", authMiddleware, async (req, res) => {
-  const { dog1Name, dog2Name, slug } = req.body;
-  if (!dog1Name || !dog2Name) return res.status(400).json({ error: "Both dog names required" });
-  try {
-    const partySlug = (slug || dog1Name.toLowerCase().replace(/[^a-z0-9]/g, "-") + "-" + crypto.randomUUID().slice(0, 6)).toLowerCase().replace(/[^a-z0-9-]/g, "");
-    const existing = await db.getPartyBySlug(partySlug);
-    if (existing) return res.status(400).json({ error: "Slug taken, try another" });
-    const party = await db.createParty({
-      id: crypto.randomUUID(), slug: partySlug, userId: req.userId,
-      dog1Name: dog1Name.trim(), dog2Name: dog2Name.trim(),
-      createdAt: new Date().toISOString(),
-    });
-    res.status(201).json({ id: party.id, slug: party.slug, dog1Name: party.dog1_name, dog2Name: party.dog2_name });
-  } catch (e) { res.status(500).json({ error: "Server error" }); }
+  const { dogs, slug } = req.body;
+  if (!dogs || !Array.isArray(dogs) || dogs.length === 0 || !dogs.every(d => d.name && d.name.trim())) return res.status(400).json({ error: "At least one dog name required" });
+  const cleanDogs = dogs.map(d => ({ name: d.name.trim() }));
+  const s = (slug || cleanDogs[0].name.toLowerCase().replace(/[^a-z0-9]/g,"-")+"-"+crypto.randomUUID().slice(0,6)).toLowerCase().replace(/[^a-z0-9-]/g,"");
+  if (await db.getPartyBySlug(s)) return res.status(400).json({ error: "Slug taken" });
+  const party = await db.createParty({ id: crypto.randomUUID(), slug: s, userId: req.userId, dogs: cleanDogs, createdAt: new Date().toISOString() });
+  res.status(201).json({ id: party.id, slug: party.slug, dogs: party.dogs || cleanDogs });
 });
 
-app.delete("/api/parties/:slug", partyAuth, async (req, res) => {
-  await db.deleteParty(req.params.slug);
-  res.json({ ok: true });
-});
+app.delete("/api/parties/:slug", partyAuth, async (req, res) => { await db.deleteParty(req.params.slug); res.json({ ok:true }); });
 
-// --- Party-specific: guest guessing ---
+// --- Guesses ---
 app.get("/api/parties/:slug/guesses", async (req, res) => {
-  const data = await db.getPartyData(req.params.slug);
-  if (!data) return res.status(404).json({ error: "Party not found" });
-  res.json(data);
+  const d = await db.getPartyData(req.params.slug);
+  if (!d) return res.status(404).json({ error: "Not found" });
+  res.json({ revealed: d.revealed||false, answers: d.answers, guesses: d.guesses||[] });
 });
 
 app.post("/api/parties/:slug/guesses", async (req, res) => {
   const data = await db.getPartyData(req.params.slug);
-  if (!data) return res.status(404).json({ error: "Party not found" });
-  const { name, dog1, dog2 } = req.body;
-  if (!name || !name.trim()) return res.status(400).json({ error: "Name is required" });
-  if (!dog1 || !Array.isArray(dog1) || dog1.length === 0) return res.status(400).json({ error: "At least one breed required" });
-  if (!dog2 || !Array.isArray(dog2) || dog2.length === 0) return res.status(400).json({ error: "At least one breed required" });
-  const guess = {
-    id: crypto.randomUUID().slice(0, 8),
-    name: name.trim(),
-    dog1: dog1.filter(b => b && b.trim()).map(b => b.trim()),
-    dog2: dog2.filter(b => b && b.trim()).map(b => b.trim()),
-    timestamp: new Date().toISOString(),
-  };
+  if (!data) return res.status(404).json({ error: "Not found" });
+  const { name, guesses } = req.body;
+  if (!name || !name.trim()) return res.status(400).json({ error: "Name required" });
+  if (!guesses || !Array.isArray(guesses) || guesses.length === 0) return res.status(400).json({ error: "At least one breed guess required" });
+  const clean = guesses.map(g => (Array.isArray(g) ? g : [g]).filter(b => b && b.trim()).map(b => b.trim())).filter(g => g.length > 0);
+  if (clean.length === 0) return res.status(400).json({ error: "At least one breed per dog" });
+  const guess = { id: crypto.randomUUID().slice(0,8), name: name.trim(), guesses: clean, timestamp: new Date().toISOString() };
   data.guesses.push(guess);
   await db.updatePartyGuesses(req.params.slug, data.guesses);
   res.status(201).json(guess);
 });
 
-// --- Party-specific: admin ---
+// --- Admin ---
 app.get("/api/parties/:slug/answers", partyAuth, async (req, res) => {
-  const data = await db.getPartyData(req.params.slug);
-  res.json({ answers: data.answers, revealed: data.revealed });
+  const d = await db.getPartyData(req.params.slug);
+  res.json({ answers: d.answers, revealed: d.revealed });
 });
 
 app.post("/api/parties/:slug/answers", partyAuth, async (req, res) => {
-  const { dog1, dog2, image1, image2 } = req.body;
-  if (!dog1 || !Array.isArray(dog1) || dog1.length === 0) return res.status(400).json({ error: "At least one breed" });
-  if (!dog2 || !Array.isArray(dog2) || dog2.length === 0) return res.status(400).json({ error: "At least one breed" });
-  const c1 = dog1.filter(b => b && b.breed && b.breed.trim()).map(b => ({ breed: b.breed.trim(), percentage: Number(b.percentage) || 0 }));
-  const c2 = dog2.filter(b => b && b.breed && b.breed.trim()).map(b => ({ breed: b.breed.trim(), percentage: Number(b.percentage) || 0 }));
-  const t1 = c1.reduce((s, b) => s + b.percentage, 0), t2 = c2.reduce((s, b) => s + b.percentage, 0);
-  if (Math.abs(t1 - 100) > 0.5 || Math.abs(t2 - 100) > 0.5) return res.status(400).json({ error: "Percentages must add up to 100%" });
-  const answers = { dog1: c1, dog2: c2, image1: image1 || null, image2: image2 || null };
-  await db.updatePartyAnswers(req.params.slug, answers);
-  res.json({ ok: true, answers });
+  const { dogs } = req.body;
+  if (!dogs || !Array.isArray(dogs) || dogs.length === 0) return res.status(400).json({ error: "At least one dog" });
+  const clean = dogs.map(d => {
+    const breeds = (d.breeds||[]).filter(b => b && b.breed && b.breed.trim()).map(b => ({ breed: b.breed.trim(), percentage: Number(b.percentage)||0 }));
+    const total = breeds.reduce((s,b) => s + b.percentage, 0);
+    if (Math.abs(total - 100) > 0.5) return null;
+    return { breeds, image: d.image || null };
+  });
+  if (clean.includes(null)) return res.status(400).json({ error: "Each dog's percentages must sum to 100%" });
+  await db.updatePartyAnswers(req.params.slug, { dogs: clean });
+  res.json({ ok: true, dogs: clean });
 });
 
 app.delete("/api/parties/:slug/guesses/:id", partyAuth, async (req, res) => {
   const data = await db.getPartyData(req.params.slug);
-  const idx = (data.guesses || []).findIndex(g => g.id === req.params.id);
+  const idx = (data.guesses||[]).findIndex(g => g.id === req.params.id);
   if (idx === -1) return res.status(404).json({ error: "Not found" });
   data.guesses.splice(idx, 1);
   await db.updatePartyGuesses(req.params.slug, data.guesses);
@@ -203,27 +148,29 @@ app.delete("/api/parties/:slug/guesses/:id", partyAuth, async (req, res) => {
 
 app.post("/api/parties/:slug/reveal", partyAuth, async (req, res) => {
   const data = await db.getPartyData(req.params.slug);
-  if (!data.answers) return res.status(400).json({ error: "Set answers first" });
-  const names1 = data.answers.dog1.map(e => e.breed.toLowerCase());
-  const names2 = data.answers.dog2.map(e => e.breed.toLowerCase());
-  function scoreDog(guess, answerNames) {
-    const set = new Set(answerNames);
-    const matches = guess.filter(b => set.has(b.toLowerCase())).length;
-    if (matches === answerNames.length && guess.length === answerNames.length) return "correct";
+  if (!data.answers || !data.answers.dogs) return res.status(400).json({ error: "Set answers first" });
+
+  function scoreDog(guessBreeds, answerBreeds) {
+    const set = new Set(answerBreeds.map(b => b.breed.toLowerCase()));
+    const matches = guessBreeds.filter(b => set.has(b.toLowerCase())).length;
+    if (matches === answerBreeds.length && guessBreeds.length === answerBreeds.length) return "correct";
     if (matches > 0) return "close";
     return "wrong";
   }
+
   data.guesses.forEach(g => {
-    g.score1 = scoreDog(g.dog1, names1); g.score2 = scoreDog(g.dog2, names2);
-    if (g.score1 === "correct" && g.score2 === "correct") g.score = "correct";
-    else if (g.score1 !== "wrong" || g.score2 !== "wrong") g.score = "close";
-    else g.score = "wrong";
+    g.scores = (g.guesses || []).map((gg, i) => {
+      const ans = data.answers.dogs[i];
+      return ans ? scoreDog(gg, ans.breeds) : "wrong";
+    });
+    g.score = g.scores.every(s => s === "correct") ? "correct" : g.scores.some(s => s !== "wrong") ? "close" : "wrong";
   });
+
   await db.updatePartyReveal(req.params.slug, data.guesses);
   res.json({ ok: true, answers: data.answers, guesses: data.guesses });
 });
 
-// --- Serve pages ---
+// --- Pages ---
 app.get("/", (req, res) => res.sendFile(path.join(__dirname, "public", "login.html")));
 app.get("/dashboard", (req, res) => res.sendFile(path.join(__dirname, "public", "dashboard.html")));
 app.get("/p/:slug", (req, res) => res.sendFile(path.join(__dirname, "public", "party.html")));
@@ -231,27 +178,21 @@ app.get("/p/:slug/admin", (req, res) => res.sendFile(path.join(__dirname, "publi
 app.get("/p/:slug/slideshow", (req, res) => res.sendFile(path.join(__dirname, "public", "party-slideshow.html")));
 app.get("/p/:slug/qr", (req, res) => res.sendFile(path.join(__dirname, "public", "party-qr.html")));
 
-// Helper for Google OAuth
 function postForm(url, params) {
   return new Promise((resolve, reject) => {
     const body = new URLSearchParams(params).toString();
-    const req = https.request(url, { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded", "Content-Length": body.length } }, res => {
-      let data = ""; res.on("data", c => data += c); res.on("end", () => resolve(data));
-    });
-    req.on("error", reject); req.write(body); req.end();
+    const req = https.request(url, { method:"POST", headers:{"Content-Type":"application/x-www-form-urlencoded","Content-Length":body.length} }, res => {
+      let d=""; res.on("data",c=>d+=c); res.on("end",()=>resolve(d));
+    }); req.on("error",reject); req.write(body); req.end();
   });
 }
 function httpGet(url, headers) {
   return new Promise((resolve, reject) => {
-    https.get(url, { headers }, res => {
-      let data = ""; res.on("data", c => data += c); res.on("end", () => resolve(data));
-    }).on("error", reject);
+    https.get(url, { headers }, res => { let d=""; res.on("data",c=>d+=c); res.on("end",()=>resolve(d)); }).on("error",reject);
   });
 }
 
-// Local dev: listen on port. Vercel: export the app.
 if (process.env.NODE_ENV !== "production" || !process.env.VERCEL) {
-  app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));
+  app.listen(PORT, () => console.log(`http://localhost:${PORT}`));
 }
-
 module.exports = app;

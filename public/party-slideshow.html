@@ -1,227 +1,39 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Reveal – Dog Breed Reveal Party</title>
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <style>
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    :root{--gold:#F5A623;--coral:#FF6B6B;--teal:#4ECDC4;--green:#7BC67E;--dark-bg:#2D1B0E}
-    body{font-family:'Nunito',sans-serif;background:linear-gradient(160deg,#2D1B0E 0%,#4A2C1A 35%,#3D2312 70%,#1A0E06 100%);min-height:100vh;color:white;overflow-x:hidden}
-    .bg-paws{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
-    .bg-paw{position:absolute;opacity:.03;font-size:80px;user-select:none;animation:floatPaw 10s ease-in-out infinite}
-    .bg-paw:nth-child(1){top:5%;left:5%}.bg-paw:nth-child(2){top:20%;right:10%;animation-delay:2s;font-size:50px}
-    .bg-paw:nth-child(3){top:50%;left:8%;animation-delay:4s;font-size:60px}
-    .bg-paw:nth-child(4){top:70%;right:8%;animation-delay:6s;font-size:55px}
-    @keyframes floatPaw{0%,100%{transform:translateY(0)rotate(-5deg)}50%{transform:translateY(-25px)rotate(5deg)}}
-    .container{max-width:800px;width:100%;margin:0 auto;padding:20px;position:relative;z-index:1}
-    .top-nav{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:16px}
-    .nav-link{padding:8px 16px;border-radius:12px;text-decoration:none;font-weight:700;font-size:.85rem;color:rgba(255,255,255,.5);background:rgba(255,255,255,.06)}
-    .nav-link:hover{background:var(--gold);color:white}
-    .screen{text-align:center;min-height:70vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px 0}
-    .reveal-btn{padding:30px 70px;font-size:2.2rem;font-family:'Fredoka One',cursive;background:linear-gradient(135deg,#FF6B6B,#e04040);color:white;border:none;border-radius:28px;cursor:pointer;box-shadow:0 8px 50px rgba(255,80,80,.5);animation:pulse 2s ease-in-out infinite;letter-spacing:2px}
-    @keyframes pulse{0%,100%{box-shadow:0 8px 50px rgba(255,80,80,.5)}50%{box-shadow:0 8px 80px rgba(255,80,80,.8)}}
-    .reveal-btn:hover{transform:scale(1.06);animation:none}
-    .start-emoji{font-size:70px;margin-bottom:16px;animation:bounce 1.5s ease-in-out infinite alternate}
-    @keyframes bounce{0%{transform:translateY(0)}100%{transform:translateY(-12px)}}
-    .countdown-number{font-family:'Fredoka One',cursive;font-size:14rem;line-height:1;animation:countPop .5s cubic-bezier(.68,-.55,.265,1.55);text-shadow:0 0 80px rgba(245,166,35,.7)}
-    .countdown-number.three{color:var(--teal)}.countdown-number.two{color:var(--gold);font-size:15rem}.countdown-number.one{color:var(--coral);font-size:16rem}
-    @keyframes countPop{0%{transform:scale(.1)rotate(-10deg);opacity:0}60%{transform:scale(1.1)rotate(2deg)}100%{transform:scale(1)}}
-    .reveal-title{font-family:'Fredoka One',cursive;font-size:3rem;margin-bottom:20px;text-shadow:0 4px 30px rgba(0,0,0,.4);animation:fadeInUp .6s .2s both}
-    @keyframes fadeInUp{0%{transform:translateY(30px);opacity:0}100%{transform:translateY(0);opacity:1}}
-    @keyframes fadeIn{0%{opacity:0}100%{opacity:1}}
-    .breed-reveal-area{display:flex;flex-direction:column;align-items:center;margin:0 auto 10px}
-    .photo-ring-wrap{position:relative;width:280px;height:280px;margin:0 auto;animation:fadeInUp .8s both}
-    .photo-ring-wrap svg{width:100%;height:100%}
-    .photo-ring-wrap .photo-img,.photo-ring-wrap .photo-placeholder{animation:fadeIn .6s .3s both}
-    .photo-ring-wrap .photo-img{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:190px;height:190px;border-radius:50%;object-fit:cover;border:4px solid white;box-shadow:0 4px 20px rgba(0,0,0,.3)}
-    .photo-ring-wrap .photo-placeholder{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:190px;height:190px;border-radius:50%;background:rgba(255,255,255,.08);border:4px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:70px}
-    .ring-segment{fill:none;stroke-width:14;transition:stroke-dashoffset 1.5s ease-out}
-    .embark-labels{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap;justify-content:center}
-    .embark-label{display:flex;align-items:center;gap:6px;padding:8px 16px;border-radius:20px;background:rgba(255,255,255,.07);font-weight:700;font-size:.9rem;animation:fadeInUp .5s both}
-    .embark-dot{width:14px;height:14px;border-radius:4px;flex-shrink:0}
-    .reveal-subtitle{font-size:1.5rem;opacity:.7;margin:24px 0 16px;animation:fadeInUp .5s both}
-    .result-list{width:100%;max-width:550px;margin:0 auto}
-    .result-row{display:flex;align-items:center;gap:12px;padding:10px 16px;margin-bottom:8px;border-radius:14px;opacity:0;animation:slideInRow .5s ease-out forwards}
-    @keyframes slideInRow{0%{transform:translateX(-40px);opacity:0}100%{transform:translateX(0);opacity:1}}
-    .result-row.correct{background:rgba(123,198,126,.12);border:1px solid rgba(123,198,126,.15)}
-    .result-row.close{background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.1)}
-    .result-row.wrong{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.04)}
-    .result-pos{font-family:'Fredoka One',cursive;font-size:1.4rem;width:32px;flex-shrink:0}
-    .result-avatar{font-size:28px;flex-shrink:0}
-    .result-info{flex:1;text-align:left;min-width:0}
-    .result-name{font-weight:800;font-size:1rem}
-    .result-breeds{font-size:.78rem;opacity:.6}
-    .result-badge{padding:5px 14px;border-radius:14px;font-weight:800;font-size:.75rem;text-transform:uppercase;letter-spacing:.5px;flex-shrink:0}
-    .result-badge.correct{background:var(--green);color:white}
-    .result-badge.close{background:var(--gold);color:var(--dark-bg)}
-    .result-badge.wrong{background:rgba(255,255,255,.08);color:rgba(255,255,255,.4)}
-    .next-btn{margin-top:30px;padding:16px 44px;font-size:1.3rem;font-family:'Fredoka One',cursive;background:var(--teal);color:white;border:none;border-radius:18px;cursor:pointer;box-shadow:0 6px 30px rgba(78,205,196,.4);animation:fadeInUp .5s .3s both;transition:transform .2s}
-    .next-btn:hover{transform:scale(1.06)}
-    .summary-stats{display:flex;gap:14px;justify-content:center;margin:16px 0;flex-wrap:wrap}
-    .summary-stat{padding:18px 28px;border-radius:18px;text-align:center;min-width:110px}
-    .summary-stat.correct{background:rgba(123,198,126,.15);border:1px solid rgba(123,198,126,.2)}
-    .summary-stat.close{background:rgba(245,166,35,.12);border:1px solid rgba(245,166,35,.15)}
-    .summary-stat.wrong{background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.12)}
-    .summary-stat .num{font-family:'Fredoka One',cursive;font-size:2.5rem;line-height:1}
-    .summary-stat .lbl{font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-top:4px;opacity:.7}
-    .winner-name{font-family:'Fredoka One',cursive;font-size:2rem;color:var(--gold);margin:4px 0;text-shadow:0 0 30px rgba(245,166,35,.4)}
-    .confetti-piece{position:fixed;pointer-events:none;z-index:999;border-radius:3px;animation:confettiFall 2.5s ease-out forwards}
-    @keyframes confettiFall{0%{transform:translateY(-80px)rotate(0deg);opacity:1}100%{transform:translateY(105vh)rotate(900deg);opacity:0}}
-    .spotlight{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:600px;height:600px;pointer-events:none;z-index:0;background:radial-gradient(circle,rgba(245,166,35,.1)0%,transparent 70%);transition:opacity .5s}
-    .hidden{display:none!important}
-    @media(max-width:500px){.reveal-title{font-size:2rem}.countdown-number{font-size:8rem}.countdown-number.two{font-size:9rem}.countdown-number.one{font-size:10rem}.reveal-btn{font-size:1.4rem;padding:20px 40px}}
-  </style>
-</head>
-<body>
-  <div class="spotlight" id="spotlight"></div>
-  <div class="bg-paws"><span class="bg-paw">🐾</span><span class="bg-paw">🐾</span><span class="bg-paw">🐾</span><span class="bg-paw">🐾</span></div>
-
-  <div class="container">
-    <div class="top-nav">
-      <a href="/dashboard" class="nav-link">← Dashboard</a>
-      <a href="#" class="nav-link" id="nav-admin">Admin</a>
-      <a href="#" class="nav-link" id="nav-qr">QR</a>
-    </div>
-
-    <div class="screen" id="phase-start">
-      <div class="start-emoji">🐶 🎉 🐩</div>
-      <button class="reveal-btn" id="reveal-btn">🎉 Reveal the Answer!</button>
-    </div>
-    <div class="screen hidden" id="phase-countdown">
-      <div class="countdown-number" id="countdown-num">3</div>
-    </div>
-    <div class="screen hidden" id="phase-fifi"><div id="fifi-content"></div></div>
-    <div class="screen hidden" id="phase-snowy"><div id="snowy-content"></div></div>
-    <div class="screen hidden" id="phase-summary"><div id="summary-content"></div></div>
-  </div>
-
-  <script>
-    const slug = window.location.pathname.split("/p/")[1]?.split("/")[0];
-    const API = `/api/parties/${slug}`;
-    const token = localStorage.getItem("token");
-    const authHeaders = { "Content-Type":"application/json", "Authorization":"Bearer "+token };
-    document.getElementById("nav-admin").href = `/p/${slug}/admin`;
-    document.getElementById("nav-qr").href = `/p/${slug}/qr`;
-
-    let allGuesses=[],answers=null,dog1Name="Dog 1",dog2Name="Dog 2";
-    const SEGMENT_COLORS=["#4A90D9","#7BC67E","#F5A623","#E87D7D","#9B7ED8","#4ECDC4"];
-
-    function esc(s){const d=document.createElement("div");d.textContent=s;return d.innerHTML}
-    function confetti(c=60){const cols=["#F5A623","#FF6B6B","#4ECDC4","#FF8DA1","#7BC67E","#FFD93D"];for(let i=0;i<c;i++){const p=document.createElement("div");p.className="confetti-piece";p.style.left=Math.random()*100+"%";p.style.top=-(Math.random()*50)+"px";p.style.background=cols[Math.floor(Math.random()*cols.length)];p.style.animationDelay=Math.random()*1.2+"s";p.style.animationDuration=(2+Math.random()*3)+"s";p.style.width=(8+Math.random()*16)+"px";p.style.height=(8+Math.random()*16)+"px";document.body.appendChild(p);setTimeout(()=>p.remove(),4500)}}
-    function wait(ms){return new Promise(r=>setTimeout(r,ms))}
-    function showPhase(id){document.querySelectorAll(".screen").forEach(s=>s.classList.add("hidden"));document.getElementById(id).classList.remove("hidden")}
-
-    function getBreedNames(e){if(!e)return[];return e.map(x=>typeof x==="string"?x:x.breed||"")}
-    function sortForDog(guesses,dogNum){
-      const scoreOrder={correct:0,close:1,wrong:2};
-      const ansSet=new Set(getBreedNames(answers[`dog${dogNum}`]).map(b=>b.toLowerCase()));
-      return [...guesses].map(g=>({...g,_mc:(g[`dog${dogNum}`]||[]).filter(b=>ansSet.has(b.toLowerCase())).length})).sort((a,b)=>{const s=scoreOrder[a[`score${dogNum}`]||"wrong"]-scoreOrder[b[`score${dogNum}`]||"wrong"];if(s)return s;const m=(b._mc||0)-(a._mc||0);if(m)return m;return a.name.localeCompare(b.name)});
-    }
-    function htmlToElement(html){const t=document.createElement("template");t.innerHTML=html.trim();return t.content.firstChild}
-
-    function renderPhotoRing(breeds,imageSrc,animate=true){
-      const area=document.createElement("div");area.className="breed-reveal-area";
-      const wrap=document.createElement("div");wrap.className="photo-ring-wrap";
-      const r=120,sw=14,circ=2*Math.PI*r;
-      let svg=`<svg viewBox="0 0 280 280"><g transform="rotate(-90 140 140)">`;
-      let off=0;
-      breeds.forEach((b,i)=>{const pct=typeof b==="string"?Math.floor(100/breeds.length):(b.percentage||0);const dL=(pct/100)*circ;svg+=`<circle cx="140" cy="140" r="${r}" class="ring-segment" stroke="${SEGMENT_COLORS[i%6]}" fill="none" stroke-width="${sw}" stroke-dasharray="${dL} ${circ}" stroke-dashoffset="${animate?circ:-off}" style="stroke-dashoffset:${-off};"/>`;off+=dL});
-      svg+=`</g></svg>`;
-      wrap.innerHTML=svg;
-      if(imageSrc){const img=document.createElement("img");img.className="photo-img";img.src=imageSrc;img.onerror=()=>{img.remove();wrap.appendChild(plc())};wrap.appendChild(img)}else{wrap.appendChild(plc())}
-      function plc(){const ph=document.createElement("div");ph.className="photo-placeholder";ph.textContent="🐶";return ph}
-      area.appendChild(wrap);
-      const labels=document.createElement("div");labels.className="embark-labels";
-      breeds.forEach((b,i)=>{const breed=typeof b==="string"?b:b.breed;const pct=typeof b==="string"?Math.floor(100/breeds.length):(b.percentage||0);const l=document.createElement("div");l.className="embark-label";l.style.animationDelay=(i*.3+.6)+"s";l.innerHTML=`<span class="embark-dot" style="background:${SEGMENT_COLORS[i%6]};"></span>${esc(breed)} <strong>${pct}%</strong>`;labels.appendChild(l)});
-      area.appendChild(labels);
-      if(animate){requestAnimationFrame(()=>{const cs=wrap.querySelectorAll(".ring-segment");let co=0;cs.forEach((c,i)=>{const pct=breeds[i].percentage||Math.floor(100/breeds.length);c.style.strokeDashoffset=-co;co+=(pct/100)*circ})})}
-      return area;
-    }
-
-    async function revealBreeds(container,breeds,name,imageSrc){
-      document.getElementById("spotlight").style.opacity="1";
-      container.innerHTML=`<div class="reveal-title">${esc(name)} is a...</div>`;
-      await wait(1000);
-      confetti(40);
-      container.appendChild(renderPhotoRing(breeds,imageSrc,true));
-      await wait(2000);
-      document.getElementById("spotlight").style.opacity="0";
-    }
-
-    async function revealGuesses(container,guesses,dogNum){
-      const sub=document.createElement("div");sub.className="reveal-subtitle";sub.textContent="Who guessed right?";container.appendChild(sub);
-      await wait(800);
-      const list=document.createElement("div");list.className="result-list";container.appendChild(list);
-      const sorted=sortForDog(guesses,dogNum);
-      const emojis=["🥇","🥈","🥉"],badges={correct:"✅ Right!",close:"🟡 Close",wrong:"❌ Nope"};
-      for(let i=0;i<sorted.length;i++){const g=sorted[i];const score=g[`score${dogNum}`]||"wrong";const row=htmlToElement(`<div class="result-row ${score}"><span class="result-pos">${i<3?emojis[i]:`${i+1}`}</span><span class="result-avatar">🐕</span><div class="result-info"><div class="result-name">${esc(g.name)}</div><div class="result-breeds">${esc((g[`dog${dogNum}`]||[]).join(", "))}</div></div><span class="result-badge ${score}">${badges[score]}</span></div>`);list.appendChild(row);if(i<sorted.length-1){const d=score==="correct"?700:score==="close"?500:300;await wait(d)}}
-      await wait(500);
-    }
-
-    function addNext(container,label,onClick){const b=document.createElement("button");b.className="next-btn";b.textContent=label;b.addEventListener("click",onClick);container.appendChild(b)}
-
-    async function runDogReveal(container,breeds,name,imageSrc,dogNum,nextLabel,onNext){
-      container.innerHTML="";
-      await revealBreeds(container,breeds,name,imageSrc);
-      await revealGuesses(container,allGuesses,dogNum);
-      addNext(container,nextLabel,onNext);
-    }
-
-    async function startCountdown(){
-      showPhase("phase-countdown");const n=document.getElementById("countdown-num");const cls=["three","two","one"];
-      for(let i=3;i>=1;i--){if(i===3)confetti(30);if(i===1)confetti(50);n.className=`countdown-number ${cls[3-i]}`;n.textContent=i;n.style.animation="none";void n.offsetWidth;n.style.animation="countPop .5s cubic-bezier(.68,-.55,.265,1.55)";await wait(1000)}
-      confetti(80);await wait(500);
-    }
-
-    async function showFifi(){showPhase("phase-fifi");await runDogReveal(document.getElementById("fifi-content"),answers.dog1,dog1Name,answers.image1,1,`Next: ${dog2Name} →`,showSnowy)}
-    async function showSnowy(){showPhase("phase-snowy");await runDogReveal(document.getElementById("snowy-content"),answers.dog2,dog2Name,answers.image2,2,"See Full Results →",showSummary)}
-
-    async function showSummary(){
-      confetti(100);showPhase("phase-summary");
-      const c=document.getElementById("summary-content");
-      c.innerHTML=`<div class="reveal-title">The Results!</div>`;await wait(600);
-
-      [0,1].forEach(x=>{const t=document.createElement("div");t.style.cssText="font-size:1.3rem;font-weight:700;opacity:0.7;margin-top:10px;";t.textContent=x===0?dog1Name:dog2Name;c.appendChild(t);c.appendChild(renderPhotoRing(answers[`dog${x+1}`],answers[`image${x+1}`],false))});
-
-      const correct=allGuesses.filter(g=>g.score==="correct").length,close=allGuesses.filter(g=>g.score==="close").length,wrong=allGuesses.filter(g=>g.score==="wrong").length;
-      const stats=document.createElement("div");stats.className="summary-stats";
-      stats.innerHTML=`<div class="summary-stat correct"><div class="num">${correct}</div><div class="lbl">Perfect</div></div><div class="summary-stat close"><div class="num">${close}</div><div class="lbl">Close</div></div><div class="summary-stat wrong"><div class="num">${wrong}</div><div class="lbl">Wrong</div></div>`;
-      c.appendChild(stats);await wait(800);
-
-      const winners=allGuesses.filter(g=>g.score==="correct");
-      if(winners.length){const w=document.createElement("div");w.style.marginTop="16px";w.innerHTML='<p style="font-size:1.3rem;opacity:0.7;">🏆 Winner(s):</p>';winners.forEach(g=>{const n=document.createElement("div");n.className="winner-name";n.textContent=g.name;w.appendChild(n)});c.appendChild(w);await wait(winners.length*300+600)}
-
-      const sub=document.createElement("div");sub.className="reveal-subtitle";sub.textContent="Full Ranking";c.appendChild(sub);
-      const a1=new Set(getBreedNames(answers.dog1).map(b=>b.toLowerCase())),a2=new Set(getBreedNames(answers.dog2).map(b=>b.toLowerCase()));
-      const so={correct:0,close:1,wrong:2};
-      const sorted=[...allGuesses].map(g=>({...g,_mc:(g.dog1||[]).filter(b=>a1.has(b.toLowerCase())).length+(g.dog2||[]).filter(b=>a2.has(b.toLowerCase())).length})).sort((a,b)=>{const s=so[a.score||"wrong"]-so[b.score||"wrong"];if(s)return s;const m=(b._mc||0)-(a._mc||0);if(m)return m;return a.name.localeCompare(b.name)});
-      const list=document.createElement("div");list.className="result-list";
-      const bdgs={correct:"✅ Perfect",close:"🟡 Close",wrong:"❌"};
-      for(let i=0;i<sorted.length;i++){const g=sorted[i];const row=htmlToElement(`<div class="result-row ${g.score||'wrong'}"><span class="result-pos">${i<3?["🥇","🥈","🥉"][i]:`${i+1}`}</span><span class="result-avatar">🐕</span><div class="result-info"><div class="result-name">${esc(g.name)}</div><div class="result-breeds">${esc(dog1Name)}: ${esc(g.dog1.join(", "))} | ${esc(dog2Name)}: ${esc(g.dog2.join(", "))}</div></div><span class="result-badge ${g.score||'wrong'}">${bdgs[g.score]||bdgs.wrong}</span></div>`);list.appendChild(row);if(i<sorted.length-1)await wait(300)}
-      c.appendChild(list);
-    }
-
-    async function init(){
-      try{const r=await fetch(`${API}/guesses`);const d=await r.json();if(d.revealed&&d.answers){answers=d.answers;allGuesses=d.guesses||[];
-      // Try to get dog names from party list
-      try{const t=localStorage.getItem("token");if(t){const p=await fetch("/api/parties",{headers:{"Authorization":"Bearer "+t}}).then(r=>r.json());const pp=p.find(x=>x.slug===slug);if(pp){dog1Name=pp.dog1Name||"Dog 1";dog2Name=pp.dog2Name||"Dog 2"}}}catch{}
-      await showFifi();return}}catch{}
-    }
-
-    init();
-
-    document.getElementById("reveal-btn").addEventListener("click",async()=>{
-      if(!token){alert("You need to log in first.");return}
-      try{
-        const aRes=await fetch(`${API}/answers`,{headers:{Authorization:"Bearer "+token}}).then(r=>r.json());
-        if(!aRes.answers){alert("No answers set! Go to the Admin page first.");return}
-        const rRes=await fetch(`${API}/reveal`,{method:"POST",headers:authHeaders}).then(r=>{if(!r.ok)return r.json().then(e=>{throw new Error(e.error)});return r.json()});
-        answers=rRes.answers;allGuesses=rRes.guesses;
-        try{const p=await fetch("/api/parties",{headers:{"Authorization":"Bearer "+token}}).then(r=>r.json());const pp=p.find(x=>x.slug===slug);if(pp){dog1Name=pp.dog1Name||"Dog 1";dog2Name=pp.dog2Name||"Dog 2"}}catch{}
-        await startCountdown();await showFifi();
-      }catch(e){alert(e.message)}
-    });
-  </script>
-</body>
-</html>
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reveal – Dog Breed Reveal Party</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}:root{--gold:#F5A623;--coral:#FF6B6B;--teal:#4ECDC4;--green:#7BC67E;--dark-bg:#2D1B0E}body{font-family:'Nunito',sans-serif;background:linear-gradient(160deg,#2D1B0E,#4A2C1A,#3D2312,#1A0E06);min-height:100vh;color:white;overflow-x:hidden}.bg-paws{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}.bg-paw{position:absolute;opacity:.03;font-size:80px;animation:floatPaw 10s ease-in-out infinite}.bg-paw:nth-child(1){top:5%;left:5%}.bg-paw:nth-child(2){top:20%;right:10%;animation-delay:2s;font-size:50px}@keyframes floatPaw{0%,100%{transform:translateY(0)rotate(-5deg)}50%{transform:translateY(-25px)rotate(5deg)}}.container{max-width:800px;width:100%;margin:0 auto;padding:20px;position:relative;z-index:1}.top-nav{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:16px}.nav-link{padding:8px 16px;border-radius:12px;text-decoration:none;font-weight:700;font-size:.85rem;color:rgba(255,255,255,.5);background:rgba(255,255,255,.06)}.nav-link:hover{background:var(--gold);color:white}.screen{text-align:center;min-height:70vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px 0}.reveal-btn{padding:30px 70px;font-size:2.2rem;font-family:'Fredoka One',cursive;background:linear-gradient(135deg,#FF6B6B,#e04040);color:white;border:none;border-radius:28px;cursor:pointer;box-shadow:0 8px 50px rgba(255,80,80,.5);animation:pulse 2s ease-in-out infinite;letter-spacing:2px}@keyframes pulse{0%,100%{box-shadow:0 8px 50px rgba(255,80,80,.5)}50%{box-shadow:0 8px 80px rgba(255,80,80,.8)}}.reveal-btn:hover{transform:scale(1.06);animation:none}.start-emoji{font-size:70px;margin-bottom:16px;animation:bounce 1.5s ease-in-out infinite alternate}@keyframes bounce{0%{transform:translateY(0)}100%{transform:translateY(-12px)}}.countdown-number{font-family:'Fredoka One',cursive;font-size:14rem;line-height:1;animation:countPop .5s cubic-bezier(.68,-.55,.265,1.55);text-shadow:0 0 80px rgba(245,166,35,.7)}.countdown-number.three{color:var(--teal)}.countdown-number.two{color:var(--gold);font-size:15rem}.countdown-number.one{color:var(--coral);font-size:16rem}@keyframes countPop{0%{transform:scale(.1)rotate(-10deg);opacity:0}60%{transform:scale(1.1)rotate(2deg)}100%{transform:scale(1)}}.reveal-title{font-family:'Fredoka One',cursive;font-size:3rem;margin-bottom:20px;text-shadow:0 4px 30px rgba(0,0,0,.4);animation:fadeInUp .6s .2s both}@keyframes fadeInUp{0%{transform:translateY(30px);opacity:0}100%{transform:translateY(0);opacity:1}}@keyframes fadeIn{0%{opacity:0}100%{opacity:1}}.photo-ring-wrap{position:relative;width:280px;height:280px;margin:0 auto;animation:fadeInUp .8s both}.photo-ring-wrap svg{width:100%;height:100%}.photo-ring-wrap .photo-img,.photo-ring-wrap .photo-placeholder{animation:fadeIn .6s .3s both}.photo-ring-wrap .photo-img{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:190px;height:190px;border-radius:50%;object-fit:cover;border:4px solid white;box-shadow:0 4px 20px rgba(0,0,0,.3)}.photo-ring-wrap .photo-placeholder{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:190px;height:190px;border-radius:50%;background:rgba(255,255,255,.08);border:4px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:70px}.ring-segment{fill:none;stroke-width:14;transition:stroke-dashoffset 1.5s ease-out}.labels{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap;justify-content:center}.label{display:flex;align-items:center;gap:6px;padding:8px 16px;border-radius:20px;background:rgba(255,255,255,.07);font-weight:700;font-size:.9rem;animation:fadeInUp .5s both}.dot{width:14px;height:14px;border-radius:4px;flex-shrink:0}.reveal-subtitle{font-size:1.5rem;opacity:.7;margin:24px 0 16px;animation:fadeInUp .5s both}.result-list{width:100%;max-width:550px;margin:0 auto}.result-row{display:flex;align-items:center;gap:12px;padding:10px 16px;margin-bottom:8px;border-radius:14px;opacity:0;animation:slideInRow .5s ease-out forwards}@keyframes slideInRow{0%{transform:translateX(-40px);opacity:0}100%{transform:translateX(0);opacity:1}}.result-row.correct{background:rgba(123,198,126,.12);border:1px solid rgba(123,198,126,.15)}.result-row.close{background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.1)}.result-row.wrong{background:rgba(255,255,255,.03)}.result-pos{font-family:'Fredoka One',cursive;font-size:1.4rem;width:32px}.result-avatar{font-size:28px}.result-info{flex:1;text-align:left;min-width:0}.result-name{font-weight:800;font-size:1rem}.result-breeds{font-size:.78rem;opacity:.6}.result-badge{padding:5px 14px;border-radius:14px;font-weight:800;font-size:.75rem;text-transform:uppercase}.result-badge.correct{background:var(--green);color:white}.result-badge.close{background:var(--gold);color:var(--dark-bg)}.result-badge.wrong{background:rgba(255,255,255,.08);color:rgba(255,255,255,.4)}.next-btn{margin-top:30px;padding:16px 44px;font-size:1.3rem;font-family:'Fredoka One',cursive;background:var(--teal);color:white;border:none;border-radius:18px;cursor:pointer;box-shadow:0 6px 30px rgba(78,205,196,.4);transition:transform .2s;animation:fadeInUp .5s .3s both}.next-btn:hover{transform:scale(1.06)}.summary-stats{display:flex;gap:14px;justify-content:center;margin:16px 0;flex-wrap:wrap}.summary-stat{padding:18px 28px;border-radius:18px;text-align:center;min-width:110px}.summary-stat.correct{background:rgba(123,198,126,.15);border:1px solid rgba(123,198,126,.2)}.summary-stat.close{background:rgba(245,166,35,.12)}.summary-stat.wrong{background:rgba(255,107,107,.1)}.summary-stat .num{font-family:'Fredoka One',cursive;font-size:2.5rem;line-height:1}.summary-stat .lbl{font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-top:4px;opacity:.7}.winner-name{font-family:'Fredoka One',cursive;font-size:2rem;color:var(--gold);margin:4px 0;text-shadow:0 0 30px rgba(245,166,35,.4)}.confetti-piece{position:fixed;pointer-events:none;z-index:999;border-radius:3px;animation:confettiFall 2.5s ease-out forwards}@keyframes confettiFall{0%{transform:translateY(-80px)rotate(0deg);opacity:1}100%{transform:translateY(105vh)rotate(900deg);opacity:0}}.spotlight{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:600px;height:600px;pointer-events:none;z-index:0;background:radial-gradient(circle,rgba(245,166,35,.1)0%,transparent 70%);transition:opacity .5s}.hidden{display:none!important}@media(max-width:500px){.reveal-title{font-size:2rem}.countdown-number{font-size:8rem}.countdown-number.two{font-size:9rem}.countdown-number.one{font-size:10rem}.reveal-btn{font-size:1.4rem;padding:20px 40px}}</style></head><body>
+<div class="bg-paws"><span class="bg-paw">🐾</span><span class="bg-paw">🐾</span></div><div class="spotlight" id="spotlight"></div>
+<div class="container"><div class="top-nav"><a href="/dashboard" class="nav-link">← Dashboard</a><a href="#" class="nav-link" id="nav-admin">Admin</a></div>
+<div class="screen" id="phase-start"><div class="start-emoji">🐶 🎉 🐩</div><button class="reveal-btn" id="reveal-btn">🎉 Reveal the Answer!</button></div>
+<div class="screen hidden" id="phase-countdown"><div class="countdown-number" id="countdown-num">3</div></div>
+<div class="screen hidden" id="phase-dog"><div id="dog-content"></div></div>
+<div class="screen hidden" id="phase-summary"><div id="summary-content"></div></div></div>
+<script>
+const slug=window.location.pathname.split("/p/")[1]?.split("/")[0];const API=`/api/parties/${slug}`;const token=localStorage.getItem("token");const auth={"Content-Type":"application/json","Authorization":"Bearer "+token};
+document.getElementById("nav-admin").href=`/p/${slug}/admin`;
+let allGuesses=[],answers=null,dogs=[],currentDog=0;const COLORS=["#4A90D9","#7BC67E","#F5A623","#E87D7D","#9B7ED8","#4ECDC4"];
+function esc(s){const d=document.createElement("div");d.textContent=s;return d.innerHTML}
+function confetti(c=60){const cols=["#F5A623","#FF6B6B","#4ECDC4","#FF8DA1","#7BC67E","#FFD93D"];for(let i=0;i<c;i++){const p=document.createElement("div");p.className="confetti-piece";p.style.left=Math.random()*100+"%";p.style.top=-(Math.random()*50)+"px";p.style.background=cols[Math.floor(Math.random()*cols.length)];p.style.animationDelay=Math.random()*1.2+"s";p.style.animationDuration=(2+Math.random()*3)+"s";p.style.width=(8+Math.random()*16)+"px";p.style.height=(8+Math.random()*16)+"px";document.body.appendChild(p);setTimeout(()=>p.remove(),4500)}}
+function wait(ms){return new Promise(r=>setTimeout(r,ms))}
+function showPhase(id){document.querySelectorAll(".screen").forEach(s=>s.classList.add("hidden"));document.getElementById(id).classList.remove("hidden")}
+function htmlToElement(html){const t=document.createElement("template");t.innerHTML=html.trim();return t.content.firstChild}
+function sortForDog(guesses,dogIdx){const so={correct:0,close:1,wrong:2};const ansSet=new Set((answers.dogs[dogIdx].breeds||[]).map(b=>b.breed.toLowerCase()));return[...guesses].map(g=>({...g,_mc:(g.guesses[dogIdx]||[]).filter(b=>ansSet.has(b.toLowerCase())).length,s:g.scores?g.scores[dogIdx]:"wrong"})).sort((a,b)=>{const s=so[a.s]-so[b.s];if(s)return s;const m=(b._mc||0)-(a._mc||0);if(m)return m;return a.name.localeCompare(b.name)})}
+function renderRing(breeds,img,animate=true){const area=document.createElement("div");area.className="photo-ring-wrap";const r=120,sw=14,circ=2*Math.PI*r;let svg=`<svg viewBox="0 0 280 280"><g transform="rotate(-90 140 140)">`;let off=0;breeds.forEach((b,i)=>{const pct=b.percentage||0;const dl=(pct/100)*circ;svg+=`<circle cx="140" cy="140" r="${r}" class="ring-segment" stroke="${COLORS[i%6]}" fill="none" stroke-width="${sw}" stroke-dasharray="${dl} ${circ}" stroke-dashoffset="${animate?circ:-off}"/>`;off+=dl});svg+=`</g></svg>`;wrap=document.createElement("div");wrap.innerHTML=svg;if(img){const im=document.createElement("img");im.className="photo-img";im.src=img;im.onerror=()=>{im.remove();const ph=document.createElement("div");ph.className="photo-placeholder";ph.textContent="🐶";wrap.appendChild(ph)};wrap.appendChild(im)}else{const ph=document.createElement("div");ph.className="photo-placeholder";ph.textContent="🐶";wrap.appendChild(ph)}area.appendChild(wrap);const lbs=document.createElement("div");lbs.className="labels";breeds.forEach((b,i)=>{const l=document.createElement("div");l.className="label";l.style.animationDelay=(i*.3+.6)+"s";l.innerHTML=`<span class="dot" style="background:${COLORS[i%6]}"></span>${esc(b.breed)} <strong>${b.percentage}%</strong>`;lbs.appendChild(l)});area.appendChild(lbs);if(animate)requestAnimationFrame(()=>{const cs=wrap.querySelectorAll(".ring-segment");let co=0;cs.forEach((c,i)=>{const pct=breeds[i].percentage||0;c.style.strokeDashoffset=-co;co+=(pct/100)*circ})});return area}
+async function revealBreeds(container,breeds,dogName,img){document.getElementById("spotlight").style.opacity="1";container.innerHTML=`<div class="reveal-title">${esc(dogName)} is a...</div>`;await wait(1000);confetti(40);container.appendChild(renderRing(breeds,img,true));await wait(2000);document.getElementById("spotlight").style.opacity="0"}
+async function revealGuesses(container,guesses,dogIdx){const sub=document.createElement("div");sub.className="reveal-subtitle";sub.textContent="Who guessed right?";container.appendChild(sub);await wait(800);const list=document.createElement("div");list.className="result-list";container.appendChild(list);const sorted=sortForDog(guesses,dogIdx);const emojis=["🥇","🥈","🥉"],badges={correct:"✅ Right!",close:"🟡 Close",wrong:"❌ Nope"};for(let i=0;i<sorted.length;i++){const g=sorted[i];const row=htmlToElement(`<div class="result-row ${g.s}"><span class="result-pos">${i<3?emojis[i]:`${i+1}`}</span><span class="result-avatar">🐕</span><div class="result-info"><div class="result-name">${esc(g.name)}</div><div class="result-breeds">${esc((g.guesses[dogIdx]||[]).join(", "))}</div></div><span class="result-badge ${g.s}">${badges[g.s]}</span></div>`);list.appendChild(row);if(i<sorted.length-1){const d=g.s==="correct"?700:g.s==="close"?500:300;await wait(d)}}await wait(500)}
+async function runDogReveal(dogIdx){showPhase("phase-dog");const container=document.getElementById("dog-content");container.innerHTML="";const ad=answers.dogs[dogIdx];await revealBreeds(container,ad.breeds,dogs[dogIdx].name,ad.image);await revealGuesses(container,allGuesses,dogIdx);const btn=document.createElement("button");btn.className="next-btn";if(dogIdx+1<dogs.length)btn.textContent=`Next: ${esc(dogs[dogIdx+1].name)} →`;else btn.textContent="See Full Results →";btn.addEventListener("click",()=>{if(dogIdx+1<dogs.length)runDogReveal(dogIdx+1);else showSummary()});container.appendChild(btn)}
+async function startCountdown(){showPhase("phase-countdown");const n=document.getElementById("countdown-num");const cls=["three","two","one"];for(let i=3;i>=1;i--){if(i===3)confetti(30);if(i===1)confetti(50);n.className=`countdown-number ${cls[3-i]}`;n.textContent=i;n.style.animation="none";void n.offsetWidth;n.style.animation="countPop .5s cubic-bezier(.68,-.55,.265,1.55)";await wait(1000)}confetti(80);await wait(500)}
+async function showSummary(){confetti(100);showPhase("phase-summary");const c=document.getElementById("summary-content");c.innerHTML=`<div class="reveal-title">The Results!</div>`;await wait(600);
+dogs.forEach((dog,i)=>{const t=document.createElement("div");t.style.cssText="font-size:1.3rem;font-weight:700;opacity:0.7;margin-top:10px;";t.textContent=dog.name;c.appendChild(t);c.appendChild(renderRing(answers.dogs[i].breeds,answers.dogs[i].image,false))});
+const correct=allGuesses.filter(g=>g.score==="correct").length,close=allGuesses.filter(g=>g.score==="close").length,wrong=allGuesses.filter(g=>g.score==="wrong").length;
+const stats=document.createElement("div");stats.className="summary-stats";stats.innerHTML=`<div class="summary-stat correct"><div class="num">${correct}</div><div class="lbl">Perfect</div></div><div class="summary-stat close"><div class="num">${close}</div><div class="lbl">Close</div></div><div class="summary-stat wrong"><div class="num">${wrong}</div><div class="lbl">Wrong</div></div>`;c.appendChild(stats);await wait(800);
+const winners=allGuesses.filter(g=>g.score==="correct");if(winners.length){const w=document.createElement("div");w.style.marginTop="16px";w.innerHTML='<p style="font-size:1.3rem;opacity:0.7">🏆 Winner(s):</p>';winners.forEach(g=>{const n=document.createElement("div");n.className="winner-name";n.textContent=g.name;w.appendChild(n)});c.appendChild(w);await wait(winners.length*300+600)}
+const so={correct:0,close:1,wrong:2};const sorted=[...allGuesses].sort((a,b)=>{let s=so[a.score||"wrong"]-so[b.score||"wrong"];if(s)return s;return a.name.localeCompare(b.name)});
+const sub=document.createElement("div");sub.className="reveal-subtitle";sub.textContent="Full Ranking";c.appendChild(sub);
+const list=document.createElement("div");list.className="result-list";const bdgs={correct:"✅ Perfect",close:"🟡 Close",wrong:"❌"};
+for(let i=0;i<sorted.length;i++){const g=sorted[i];const row=htmlToElement(`<div class="result-row ${g.score||'wrong'}"><span class="result-pos">${i<3?["🥇","🥈","🥉"][i]:`${i+1}`}</span><span class="result-avatar">🐕</span><div class="result-info"><div class="result-name">${esc(g.name)}</div><div class="result-breeds">${(g.guesses||[]).map((gx,j)=>`${dogs[j]?dogs[j].name:"Dog "+(j+1)}: ${gx.join(", ")}`).join(" | ")}</div></div><span class="result-badge ${g.score||'wrong'}">${bdgs[g.score]||bdgs.wrong}</span></div>`);list.appendChild(row);if(i<sorted.length-1)await wait(300)}c.appendChild(list)}
+async function init(){try{const r=await fetch(API+"/guesses");const d=await r.json();if(d.revealed&&d.answers){answers=d.answers;allGuesses=d.guesses||[];dogs=d.dogs||[];runDogReveal(0);return}}catch{}}
+init();
+document.getElementById("reveal-btn").addEventListener("click",async()=>{if(!token){alert("Login first");return}try{const ar=await fetch(API+"/answers",{headers:{Authorization:"Bearer "+token}}).then(r=>{if(!r.ok)throw new Error("Not authorized");return r.json()});if(!ar.answers){alert("No answers set!");return}const rr=await fetch(API+"/reveal",{method:"POST",headers:auth}).then(r=>{if(!r.ok)return r.json().then(e=>{throw new Error(e.error)});return r.json()});answers=rr.answers;allGuesses=rr.guesses;const gd=await fetch(API+"/guesses").then(r=>r.json());dogs=gd.dogs||[];await startCountdown();runDogReveal(0)}catch(e){alert(e.message)}})
+</script></body></html>
