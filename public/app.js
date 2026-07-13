@@ -245,7 +245,7 @@ App.createDogBlock = function(dog, index, existing) {
 
   // Add breed button
   var ab = document.createElement("button");
-  ab.className = "btn btn-outline";
+  ab.className = "btn btn-outline mt-8";
   ab.innerHTML = App.Icons.plus + 'Add breed';
   ab.onclick = function() {
     if (block.querySelectorAll(".breed-row").length >= 4) return;
