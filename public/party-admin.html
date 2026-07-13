@@ -10,10 +10,12 @@
 body{font-family:'Nunito',sans-serif;background:#faf5ed;min-height:100vh;color:#3D2B1F}
 .container{max-width:640px;margin:0 auto;padding:20px}
 .top-nav{display:flex;gap:8px;margin:15px 0;flex-wrap:wrap}
-.top-nav a{padding:8px 16px;border-radius:12px;text-decoration:none;font-weight:700;font-size:.85rem;color:#8B5E3C;background:white;box-shadow:0 2px 10px rgba(0,0,0,.06)}
+.top-nav a{padding:8px 16px;border-radius:12px;text-decoration:none;font-weight:700;font-size:.85rem;color:#8B5E3C;background:white;box-shadow:0 2px 10px rgba(0,0,0,.06);display:inline-flex;align-items:center;gap:6px}
 .top-nav a:hover{background:#F5A623;color:white}
+.top-nav a svg{width:16px;height:16px}
 .card{background:white;border-radius:20px;padding:24px;box-shadow:0 4px 15px rgba(0,0,0,.06);margin-bottom:16px}
-.card h3{font-family:'Fredoka One',cursive;color:#8B5E3C;margin-bottom:12px}
+.card h3{font-family:'Fredoka One',cursive;color:#8B5E3C;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.card h3 svg{width:22px;height:22px}
 .fg{margin-bottom:14px}.fg label{display:block;font-weight:700;color:#8B5E3C;margin-bottom:5px;font-size:.85rem}
 .fg input,.fg select{width:100%;padding:12px 14px;border:2px solid #E8D5C4;border-radius:12px;font-size:1rem;background:#FFFBF5}
 .fg input:focus,.fg select:focus{outline:none;border-color:#F5A623}
@@ -37,24 +39,50 @@ body{font-family:'Nunito',sans-serif;background:#faf5ed;min-height:100vh;color:#
 .phor{font-size:.8rem;color:#aaa;font-weight:700}
 .pv{max-width:200px;height:200px;object-fit:cover;border-radius:14px;margin-top:8px;border:2px solid #f0e0cc;display:none}
 .pv.show{display:block}
-.btn{padding:10px 20px;border:none;border-radius:14px;font-weight:700;font-size:.9rem;cursor:pointer}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 24px;border:none;border-radius:14px;font-weight:700;font-size:.95rem;cursor:pointer;transition:transform .2s}
+.btn svg{width:20px;height:20px;flex-shrink:0}
 .btn:hover{transform:translateY(-1px)}
-.btn-p{width:100%;background:linear-gradient(135deg,#F5A623,#E8961A);color:white;box-shadow:0 4px 15px rgba(245,166,35,.3);padding:14px}
-.btn-d{background:#FF6B6B;color:white}.btn-s{padding:5px 12px;font-size:.75rem;border-radius:10px}
-.sm{font-size:.85rem;margin-bottom:10px}
+.btn-p{width:100%;background:linear-gradient(135deg,#F5A623,#E8961A);color:white;box-shadow:0 4px 15px rgba(245,166,35,.3)}
+.btn-d{background:#FF6B6B;color:white}
+.btn-s{padding:6px 12px;font-size:.8rem;border-radius:10px}.btn-s svg{width:16px;height:16px}
+.btn-icon{width:44px;height:44px;padding:0;border-radius:14px;background:#4ECDC4;color:white;box-shadow:0 4px 15px rgba(78,205,196,.3)}
+.btn-icon:hover{box-shadow:0 6px 20px rgba(78,205,196,.5)}
+.btn-icon svg{width:20px;height:20px}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.spin svg{animation:spin .8s linear infinite}
+.sm{font-size:.85rem;margin-bottom:10px}.sm .good{color:#7BC67E;font-weight:700}
 .ar{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid #f0e0cc}
 .ar:last-child{border-bottom:none}.ai{flex:1;min-width:0}
 .an{font-weight:800;font-size:.9rem}.ab{font-size:.78rem;color:#888}
+.gheader{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
 </style></head><body>
 <div class="container">
 <div class="top-nav">
-  <a href="/dashboard">← Dashboard</a>
-  <a href="#" id="navs">🎉 Slideshow</a>
-  <a href="#" id="navq">QR</a>
-  <a href="#" id="navg">Guess</a>
+  <a href="/dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5m7-7l-7 7 7 7"/></svg>Dashboard</a>
+  <a href="#" id="navs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>Slideshow</a>
+  <a href="#" id="navq"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>QR</a>
+  <a href="#" id="navg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Guess</a>
 </div>
-<div class="card"><h3>🎯 Set Correct Breeds</h3><div class="sm" id="amsg"></div><div id="adogs"></div><button class="btn btn-p" id="sbtn">💾 Save Answers</button></div>
-<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 style="margin-bottom:0">🗑️ Manage Guesses</h3><button class="btn btn-p btn-s" id="rbtn">🔄 Refresh</button></div><div id="glist"></div></div>
+
+<div class="card">
+  <h3><svg viewBox="0 0 24 24" fill="none" stroke="#F5A623" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>Set Correct Breeds</h3>
+  <div class="sm" id="amsg"></div>
+  <div id="adogs"></div>
+  <button class="btn btn-p" id="sbtn">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+    Save Answers
+  </button>
+</div>
+
+<div class="card">
+  <div class="gheader">
+    <h3 style="margin-bottom:0"><svg viewBox="0 0 24 24" fill="none" stroke="#FF6B6B" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>Manage Guesses</h3>
+    <button class="btn btn-icon" id="rbtn" title="Refresh">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
+    </button>
+  </div>
+  <div id="glist"></div>
+</div>
 </div></body>
 <script>
 var slug = window.location.pathname.split("/p/")[1].split("/")[0];
@@ -87,11 +115,11 @@ function brow(i, breed, pct) {
   var inp = document.createElement("input"); inp.type = "number"; inp.className = "pi"; inp.value = pct || 0; inp.min = 0; inp.max = 100; inp.placeholder = "%";
   pw.appendChild(inp);
   d.appendChild(sw); d.appendChild(pw);
-  if (i > 0) { var rm = document.createElement("button"); rm.className = "rmb"; rm.textContent = "×"; rm.onclick = function() { d.remove(); utot(); }; d.appendChild(rm); }
+  if (i > 0) { var rm = document.createElement("button"); rm.className = "rmb"; rm.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>'; rm.onclick = function() { d.remove(); utot(); }; d.appendChild(rm); }
   else { var sp = document.createElement("span"); sp.style.width = "28px"; sp.style.flexShrink = "0"; d.appendChild(sp); }
   inp.oninput = utot;
-  s = sw.querySelector("select");
-  s.onchange = function() {
+  var selEl = sw.querySelector("select");
+  selEl.onchange = function() {
     var block = d.closest(".dog-block");
     if (block.querySelectorAll(".br").length === 1) adist(block);
     utot();
@@ -125,12 +153,10 @@ function utot() {
   for (var i = 0; i < blocks.length; i++) {
     var data = collect(blocks[i]), total = 0;
     for (var j = 0; j < data.length; j++) total += data[j].percentage;
-    var pctEl = blocks[i].querySelector(".pt");
-    var valEl = blocks[i].querySelector(".pv");
     var bar = blocks[i].querySelector(".pf");
     var tv = blocks[i].querySelector(".tv");
     if (tv) tv.textContent = total + "%";
-    if (bar) { bar.style.width = Math.min(total, 100) + "%"; var g = Math.abs(total - 100) < 1; bar.className = "pf " + (g ? "good" : "bad"); pctEl.className = "pt " + (g ? "good" : "bad"); }
+    if (bar) { bar.style.width = Math.min(total, 100) + "%"; var g = Math.abs(total - 100) < 1; bar.className = "pf " + (g ? "good" : "bad"); }
   }
 }
 
@@ -198,7 +224,7 @@ document.getElementById("sbtn").onclick = function() {
   fetch(API + "/answers", { method: "POST", headers: hdrs, body: JSON.stringify({ dogs: dogs }) })
     .then(function(r) { return r.json().then(function(d) { if (!r.ok) throw new Error(d.error); return d; }); })
     .then(function() {
-      document.getElementById("amsg").innerHTML = "<span style=\"color:" + "#7BC67E" + ";font-weight:700\">✅ Saved!</span>";
+      document.getElementById("amsg").innerHTML = "<span class=\"good\">✓ Saved!</span>";
       setTimeout(function() { document.getElementById("amsg").innerHTML = ""; }, 3000);
     })
     .catch(function(e) { alert(e.message || "Failed to save"); });
@@ -218,7 +244,10 @@ function loadpanel() {
 
 function loadguesses() {
   var list = document.getElementById("glist");
+  var btn = document.getElementById("rbtn");
+  btn.classList.add("spin");
   fetch(API + "/guesses").then(function(r) { return r.json(); }).then(function(d) {
+    btn.classList.remove("spin");
     var g = d.guesses || [];
     if (!g.length) { list.innerHTML = "<p style=\"color:#888;text-align:center;padding:10px\">No guesses yet.</p>"; return; }
     var h = "";
@@ -226,7 +255,7 @@ function loadguesses() {
       var gg = g[i];
       var gbreeds = [];
       for (var j = 0; j < (gg.guesses || []).length; j++) gbreeds.push("Dog " + (j+1) + ": " + gg.guesses[j].join(", "));
-      h += "<div class=\"ar\"><div class=\"ai\"><div class=\"an\">" + esc(gg.name) + "</div><div class=\"ab\">" + esc(gbreeds.join(" | ")) + "</div></div><button class=\"btn btn-d btn-s db\" data-id=\"" + gg.id + "\">🗑️</button></div>";
+      h += "<div class=\"ar\"><div class=\"ai\"><div class=\"an\">" + esc(gg.name) + "</div><div class=\"ab\">" + esc(gbreeds.join(" | ")) + "</div></div><button class=\"btn btn-d btn-s db\" data-id=\"" + gg.id + "\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" width=\"14\" height=\"14\"><polyline points=\"3 6 5 6 21 6\"/><path d=\"M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2\"/></svg></button></div>";
     }
     list.innerHTML = h;
     var btns = list.querySelectorAll(".db");
@@ -236,7 +265,7 @@ function loadguesses() {
         fetch(API + "/guesses/" + this.dataset.id, { method: "DELETE", headers: hdrs }).then(function() { loadguesses(); });
       };
     }
-  }).catch(function() { list.innerHTML = "<p style=\"color:#888\">Could not load.</p>"; });
+  }).catch(function() { btn.classList.remove("spin"); list.innerHTML = "<p style=\"color:#888\">Could not load.</p>"; });
 }
 
 document.getElementById("rbtn").onclick = loadguesses;

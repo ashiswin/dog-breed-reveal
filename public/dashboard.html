@@ -45,14 +45,11 @@ body{font-family:'Nunito',sans-serif;background:#faf5ed;min-height:100vh;color:v
 <body>
 <div class="container">
 <div class="top-bar">
-  <h1>🐾 My Reveal Parties</h1>
+  <h1><svg viewBox="0 0 24 24" fill="none" stroke="#8B5E3C" stroke-width="2" style="width:28px;height:28px;vertical-align:middle"><path d="M12 2L15 8l6 1-4 4 1 6-5-3-5 3 1-6-4-4 6-1z"/></svg> My Reveal Parties</h1>
   <div style="display:flex;align-items:center;gap:10px;">
     <span id="userName" style="font-weight:700;opacity:.7;"></span>
-    <button class="btn btn-outline" onclick="logout()">Log out</button>
-  </div>
-</div>
-
-<button class="btn btn-primary" onclick="openCreate()">＋ New Reveal Party</button>
+    <button class="btn btn-outline" onclick="logout()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> Log out</button></div></div>
+<button class="btn btn-primary" onclick="openCreate()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> New Reveal Party</button>
 <div id="partyList" style="margin-top:20px;"></div>
 </div>
 
@@ -148,7 +145,7 @@ async function load() {
     var list = document.getElementById("partyList");
 
     if (!parties.length) {
-      list.innerHTML = '<div class="empty-state"><span class="big">🎉</span><p>No parties yet! Create one above.</p></div>';
+      list.innerHTML = '<div class="empty-state"><span class="big"><svg viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" style="width:60px;height:60px"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg></span><p>No parties yet! Create one above.</p></div>';
       return;
     }
 
@@ -161,15 +158,15 @@ async function load() {
         '<div class="meta">' + p.guessCount + ' guesses · ' + (p.revealed ? 'Revealed' : 'Not revealed') + ' · ' + p.slug + '</div>' +
         '</div>' +
         '<div class="party-actions">' +
-        '<a href="/p/' + p.slug + '" class="btn btn-teal">Guess</a>' +
-        '<a href="/p/' + p.slug + '/admin" class="btn btn-primary">Admin</a>' +
-        '<a href="/p/' + p.slug + '/slideshow" class="btn btn-teal">Reveal</a>' +
-        '<a href="/p/' + p.slug + '/qr" class="btn btn-primary">QR</a>' +
-        '<button class="btn btn-danger del-btn" data-slug="' + p.slug + '">🗑️</button>' +
+        '<a href="/p/' + p.slug + '" class="btn btn-teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Guess</a>' +
+        '<a href="/p/' + p.slug + '/admin" class="btn btn-primary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg> Admin</a>' +
+        '<a href="/p/' + p.slug + '/slideshow" class="btn btn-teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Reveal</a>' +
+        '<a href="/p/' + p.slug + '/qr" class="btn btn-primary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg> QR</a>' +
+        '<button class="btn btn-danger db" data-slug="' + p.slug + '"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button>' +
         '</div></div>';
     }).join("");
 
-    list.querySelectorAll(".del-btn").forEach(function(b) {
+    list.querySelectorAll(".db").forEach(function(b) {
       b.addEventListener("click", async function() {
         if (!confirm("Delete this party?")) return;
         await fetch("/api/parties/" + b.dataset.slug, { method: "DELETE", headers: headers });
