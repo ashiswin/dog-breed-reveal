@@ -119,7 +119,7 @@ app.delete("/api/parties/:slug", partyAuth, async (req, res) => { await db.delet
 app.get("/api/parties/:slug/guesses", async (req, res) => {
   const d = await db.getPartyData(req.params.slug);
   if (!d) return res.status(404).json({ error: "Not found" });
-  res.json({ revealed: d.revealed||false, answers: d.answers, guesses: d.guesses||[] });
+  res.json({ revealed: d.revealed||false, answers: d.answers, guesses: d.guesses||[], dogs: d.dogs||[] });
 });
 
 app.post("/api/parties/:slug/guesses", async (req, res) => {
