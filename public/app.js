@@ -205,7 +205,7 @@ App.createDogBlock = function(dog, index, existing) {
   ps.className = "photo-section";
   ps.innerHTML = '<label class="photo-label">' + App.Icons.image + ' Photo (optional)</label>' +
     '<div class="photo-row">' +
-    '<span class="btn btn-secondary btn-sm btn-file">' + App.Icons.upload + ' Upload<input type="file" class="pfile" accept="image/*"></span>' +
+    '<span class="btn btn-secondary btn-file">' + App.Icons.upload + ' Upload<input type="file" class="pfile" accept="image/*"></span>' +
     '<span class="photo-sep">or</span>' +
     '<input type="text" class="url-input" placeholder="Paste image URL...">' +
     '</div>' +
@@ -245,7 +245,7 @@ App.createDogBlock = function(dog, index, existing) {
 
   // Add breed button
   var ab = document.createElement("button");
-  ab.className = "btn btn-outline btn-sm";
+  ab.className = "btn btn-outline";
   ab.innerHTML = App.Icons.plus + 'Add breed';
   ab.onclick = function() {
     if (block.querySelectorAll(".breed-row").length >= 4) return;

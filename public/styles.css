@@ -110,7 +110,7 @@ select {
 .btn-icon:hover { box-shadow: 0 6px 20px rgba(78,205,196,0.5); }
 .btn-icon svg { width: 20px; height: 20px; }
 
-.btn-sm { padding: 6px var(--s-md); font-size: 0.8rem; border-radius: 10px; }
+.btn-sm { padding: 8px var(--s-md); font-size: 0.82rem; border-radius: 10px; }
 .btn-sm svg { width: 14px; height: 14px; }
 
 .btn-block { width: 100%; padding: var(--s-lg); font-size: 1.1rem; }
