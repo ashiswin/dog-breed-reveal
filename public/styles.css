@@ -164,11 +164,16 @@ select {
 .breed-row { display: flex; align-items: center; gap: 6px; margin-bottom: var(--s); }
 .breed-row .select-col { flex: 2.5; }
 .breed-row .pct-col { flex: 0.7; }
+.breed-row select,
 .breed-row .pct-input {
-  width: 100%; padding: 12px var(--s); border: 2px solid var(--border);
+  height: 48px; padding: 0 14px; border: 2px solid var(--border);
   border-radius: 12px; font-family: var(--font); font-size: 1rem;
-  background: var(--bg-light); text-align: center;
+  background: var(--bg-light);
 }
+.breed-row .pct-input {
+  padding: 0 8px; text-align: center;
+}
+.breed-row select:focus,
 .breed-row .pct-input:focus { outline: none; border-color: var(--gold); }
 
 .rm-btn {

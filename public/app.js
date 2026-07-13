@@ -249,11 +249,12 @@ App.createDogBlock = function(dog, index, existing) {
   ab.innerHTML = App.Icons.plus + 'Add breed';
   ab.onclick = function() {
     if (block.querySelectorAll(".breed-row").length >= 4) return;
+    var before = block.querySelector(".pct-bar-wrap");
     var row = App.createBreedRow(block.querySelectorAll(".breed-row").length, null, null, function() {
       this.parentNode.remove();
       App.updatePercentages();
     });
-    block.insertBefore(row.el, ab);
+    block.insertBefore(row.el, before);
     ab.disabled = block.querySelectorAll(".breed-row").length >= 4;
     row.select.onchange = function() {
       if (block.querySelectorAll(".breed-row").length === 1) App.autoDistribute(block);
