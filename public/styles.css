@@ -163,19 +163,18 @@ select {
 
 .breed-row { display: flex; align-items: center; gap: 6px; margin-bottom: var(--s); width: 100%; }
 .breed-row .form-group { margin-bottom: 0 !important; }
-.breed-row .select-col { flex: 1 1 0; min-width: 0; }
-.breed-row .pct-col { flex: 0 0 90px; }
+.breed-row .select-col { flex: 1; min-width: 0; }
+.breed-row .pct-col { width: 80px; flex-shrink: 0; }
 .breed-row select,
 .breed-row .pct-input {
   height: 46px; line-height: 46px; padding: 0 14px; border: 2px solid var(--border);
   border-radius: 12px; font-family: var(--font); font-size: 1rem;
-  background: var(--bg-light); width: 100%; box-sizing: border-box;
+  background: var(--bg-light); box-sizing: border-box;
 }
+.breed-row select { width: 100%; }
 .breed-row .pct-input {
-  padding: 0 8px; text-align: center;
+  width: 100%; padding: 0 8px; text-align: center;
 }
-.breed-row select:focus,
-.breed-row .pct-input:focus { outline: none; border-color: var(--gold); }
 
 .rm-btn {
   width: 28px; height: 28px; border: none; background: #FFF0F0;
