@@ -9,7 +9,8 @@ const db = require("./lib/db");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const JWT_SECRET = process.env.JWT_SECRET || crypto.randomBytes(32).toString("hex");
+let JWT_SECRET = process.env.JWT_SECRET || crypto.createHash("sha256").update(process.env.SUPABASE_URL || crypto.randomBytes(32).toString("hex")).digest("hex");
+
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || "";
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET || "";
 const BASE_URL = process.env.BASE_URL || `http://localhost:${PORT}`;
@@ -191,7 +192,6 @@ function httpGet(url, headers) {
     https.get(url, { headers }, res => { let d=""; res.on("data",c=>d+=c); res.on("end",()=>resolve(d)); }).on("error",reject);
   });
 }
-
 if (process.env.NODE_ENV !== "production" || !process.env.VERCEL) {
   app.listen(PORT, () => console.log(`http://localhost:${PORT}`));
 }
