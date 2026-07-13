@@ -202,13 +202,12 @@ App.createDogBlock = function(dog, index, existing) {
 
   // Photo section
   var ps = document.createElement("div");
-  ps.className = "photo-upload";
-  ps.style.cssText = "margin-top:10px;flex-direction:column;align-items:flex-start;";
+  ps.className = "photo-section";
   ps.innerHTML = '<label class="photo-label">' + App.Icons.image + ' Photo (optional)</label>' +
-    '<div style="display:flex;align-items:center;gap:8px;width:100%">' +
-    '<span class="btn btn-secondary btn-sm btn-file" style="cursor:pointer;">' + App.Icons.upload + ' Upload<input type="file" class="pfile" accept="image/*"></span>' +
+    '<div class="photo-row">' +
+    '<span class="btn btn-secondary btn-sm btn-file">' + App.Icons.upload + ' Upload<input type="file" class="pfile" accept="image/*"></span>' +
     '<span class="photo-sep">or</span>' +
-    '<input type="text" class="url-input" placeholder="Paste image URL..." style="flex:1">' +
+    '<input type="text" class="url-input" placeholder="Paste image URL...">' +
     '</div>' +
     '<img class="photo-preview" src="" alt="Preview">';
   block.appendChild(ps);
