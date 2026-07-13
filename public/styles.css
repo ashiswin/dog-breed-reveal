@@ -161,10 +161,10 @@ select {
 }
 .dog-section h4 { margin-bottom: var(--s); }
 
-.breed-row { display: flex; align-items: center; gap: 6px; margin-bottom: var(--s); }
+.breed-row { display: flex; align-items: center; gap: 6px; margin-bottom: var(--s); width: 100%; }
 .breed-row .form-group { margin-bottom: 0 !important; }
-.breed-row .select-col { flex: 2.5; }
-.breed-row .pct-col { flex: 0.7; }
+.breed-row .select-col { flex: 1 1 0; min-width: 0; }
+.breed-row .pct-col { flex: 0 0 90px; }
 .breed-row select,
 .breed-row .pct-input {
   height: 46px; line-height: 46px; padding: 0 14px; border: 2px solid var(--border);
