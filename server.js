@@ -81,7 +81,17 @@ app.get("/api/auth/me", authMiddleware, async (req, res) => {
 
 app.get("/api/debug", async (req, res) => {
   const raw = await db.rawQuery("parties");
-  res.json({ supabase: !!process.env.SUPABASE_URL, parties: raw, jwt: JWT_SECRET.slice(0, 8) + "..." });
+  const ins = await db.rawInsert("parties", {
+    id: "debug-" + Date.now(),
+    slug: "debug-test",
+    user_id: "00000000-0000-0000-0000-000000000000",
+    dogs: [{ name: "DebugTest" }],
+    guesses: [],
+    answers: null,
+    revealed: false,
+    created_at: new Date().toISOString(),
+  });
+  res.json({ supabase: !!process.env.SUPABASE_URL, parties: raw, insertTest: ins, jwt: JWT_SECRET.slice(0, 8) + "..." });
 });
 
 app.get("/api/parties", authMiddleware, async (req, res) => {
