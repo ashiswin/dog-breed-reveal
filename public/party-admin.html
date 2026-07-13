@@ -1,31 +1,245 @@
-<!DOCTYPE html><html lang="en"><head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Admin – Dog Breed Reveal</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
-<style>*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}:root{--gold:#F5A623;--brown:#8B5E3C;--coral:#FF6B6B;--teal:#4ECDC4;--green:#7BC67E;--dark:#3D2B1F}body{font-family:'Nunito',sans-serif;background:#faf5ed;min-height:100vh;color:var(--dark)}.container{max-width:640px;margin:0 auto;padding:20px}.top-nav{display:flex;gap:8px;margin:20px 0;flex-wrap:wrap}.nav-link{padding:8px 16px;border-radius:12px;text-decoration:none;font-weight:700;font-size:.85rem;color:var(--brown);background:white;box-shadow:0 2px 10px rgba(0,0,0,.06)}.nav-link:hover{background:var(--gold);color:white}.card{background:white;border-radius:20px;padding:24px;box-shadow:0 4px 15px rgba(0,0,0,.06);margin-bottom:16px}.card h3{font-family:'Fredoka One',cursive;color:var(--brown);margin-bottom:12px}.form-group{margin-bottom:14px}.form-group label{display:block;font-weight:700;color:var(--brown);margin-bottom:6px;font-size:.9rem}.form-group input,.form-group select{width:100%;padding:12px 16px;border:2px solid #E8D5C4;border-radius:12px;font-family:'Nunito',sans-serif;font-size:1rem;background:#FFFBF5}.form-group input:focus,.form-group select:focus{outline:none;border-color:var(--gold)}.dog-block{background:#FFFBF5;border:2px solid #F0E0CC;border-radius:14px;padding:16px;margin-bottom:12px}.dog-block h4{font-family:'Fredoka One',cursive;color:var(--brown);font-size:1rem;margin-bottom:8px}.breed-row{display:flex;align-items:center;gap:6px;margin-bottom:8px}.breed-row .s-wrap{flex:2.5}.breed-row .p-wrap{flex:.7}.breed-row .pct-input{width:100%;padding:12px 8px;border:2px solid #E8D5C4;border-radius:12px;font-size:1rem;background:#FFFBF5;text-align:center}.breed-row .pct-input:focus{outline:none;border-color:var(--gold)}.pct-total{font-size:.85rem;font-weight:700;margin-top:4px;display:flex;align-items:center;gap:6px}.pct-total.bad{color:var(--coral)}.pct-total.good{color:var(--green)}.pct-bar-bg{flex:1;height:8px;background:#f0e0cc;border-radius:4px;overflow:hidden}.pct-bar-fill{height:100%;border-radius:4px;transition:width .3s}.pct-bar-fill.good{background:var(--green)}.pct-bar-fill.bad{background:var(--coral)}.add-btn{display:inline-flex;align-items:center;gap:4px;padding:6px 14px;background:transparent;border:2px dashed var(--gold);border-radius:20px;font-weight:700;font-size:.8rem;color:var(--gold);cursor:pointer}.add-btn:hover{background:rgba(245,166,35,.08)}.add-btn:disabled{opacity:.3}.rm-btn{width:30px;height:30px;border:none;background:#FFF0F0;color:var(--coral);border-radius:50%;font-size:1rem;cursor:pointer;flex-shrink:0;font-weight:700;display:flex;align-items:center;justify-content:center}.rm-btn:hover{background:var(--coral);color:white}.photo-section{margin:10px 0 4px}.photo-label{font-size:.8rem;font-weight:700;color:var(--brown);display:block;margin-bottom:6px}.photo-inputs{display:flex;align-items:center;gap:8px}.photo-inputs input[type=file]{flex:1;font-size:.8rem}.photo-inputs input[type=text]{flex:1;padding:8px 12px;border:2px solid #E8D5C4;border-radius:10px;font-size:.85rem;background:#FFFBF5}.photo-or{font-size:.8rem;color:#aaa;font-weight:700}.photo-preview{max-width:200px;height:200px;object-fit:cover;border-radius:14px;margin-top:8px;border:2px solid #f0e0cc}.photo-preview.hidden{display:none}.btn{padding:10px 20px;border:none;border-radius:14px;font-weight:700;font-size:.95rem;cursor:pointer}.btn:hover{transform:translateY(-1px)}.btn-primary{width:100%;background:linear-gradient(135deg,var(--gold),#E8961A);color:white;box-shadow:0 4px 15px rgba(245,166,35,.3)}.btn-danger{background:var(--coral);color:white}.btn-small{padding:5px 12px;font-size:.75rem;border-radius:10px}.status-msg{font-size:.85rem;margin-bottom:10px}.admin-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid #f0e0cc}.admin-row:last-child{border-bottom:none}.admin-info{flex:1;min-width:0}.admin-name{font-weight:800;font-size:.9rem}.admin-breeds{font-size:.78rem;color:#888}.hidden{display:none}</style></head><body>
-<div class="container"><div class="top-nav"><a href="/dashboard" class="nav-link">← Dashboard</a><a href="#" class="nav-link" id="nav-slideshow">🎉 Slideshow</a><a href="#" class="nav-link" id="nav-qr">QR</a><a href="#" class="nav-link" id="nav-guess">Guess</a></div>
-<div class="card"><h3>🎯 Set Correct Breeds</h3><div class="status-msg" id="answers-status"></div><div id="admin-dogs"></div><button class="btn btn-primary" id="save-btn">💾 Save Answers</button></div>
-<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 style="margin-bottom:0">🗑️ Manage Guesses</h3><button class="btn btn-primary btn-small" id="refresh-btn">🔄 Refresh</button></div><div id="guesses-list"></div></div></div>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--gold:#F5A623;--brown:#8B5E3C;--coral:#FF6B6B;--teal:#4ECDC4;--green:#7BC67E}
+body{font-family:'Nunito',sans-serif;background:#faf5ed;min-height:100vh;color:#3D2B1F}
+.container{max-width:640px;margin:0 auto;padding:20px}
+.top-nav{display:flex;gap:8px;margin:15px 0;flex-wrap:wrap}
+.top-nav a{padding:8px 16px;border-radius:12px;text-decoration:none;font-weight:700;font-size:.85rem;color:#8B5E3C;background:white;box-shadow:0 2px 10px rgba(0,0,0,.06)}
+.top-nav a:hover{background:#F5A623;color:white}
+.card{background:white;border-radius:20px;padding:24px;box-shadow:0 4px 15px rgba(0,0,0,.06);margin-bottom:16px}
+.card h3{font-family:'Fredoka One',cursive;color:#8B5E3C;margin-bottom:12px}
+.fg{margin-bottom:14px}.fg label{display:block;font-weight:700;color:#8B5E3C;margin-bottom:5px;font-size:.85rem}
+.fg input,.fg select{width:100%;padding:12px 14px;border:2px solid #E8D5C4;border-radius:12px;font-size:1rem;background:#FFFBF5}
+.fg input:focus,.fg select:focus{outline:none;border-color:#F5A623}
+.dog-block{background:#FFFBF5;border:2px solid #F0E0CC;border-radius:14px;padding:16px;margin-bottom:12px}
+.dog-block h4{font-family:'Fredoka One',cursive;color:#8B5E3C;font-size:1rem;margin-bottom:8px}
+.br{display:flex;align-items:center;gap:6px;margin-bottom:8px}
+.br .sw{flex:2.5}.br .pw{flex:.7}
+.br .pi{width:100%;padding:12px 8px;border:2px solid #E8D5C4;border-radius:12px;font-size:1rem;background:#FFFBF5;text-align:center}
+.br .pi:focus{outline:none;border-color:#F5A623}
+.pt{font-size:.85rem;font-weight:700;margin-top:4px;display:flex;align-items:center;gap:6px}
+.pt.bad{color:#FF6B6B}.pt.good{color:#7BC67E}
+.pb{flex:1;height:8px;background:#f0e0cc;border-radius:4px;overflow:hidden}
+.pf{height:100%;border-radius:4px;transition:width .3s}.pf.good{background:#7BC67E}.pf.bad{background:#FF6B6B}
+.abtn{display:inline-flex;align-items:center;gap:4px;padding:6px 14px;background:transparent;border:2px dashed #F5A623;border-radius:20px;font-weight:700;font-size:.8rem;color:#F5A623;cursor:pointer;margin-top:4px}
+.abtn:hover{background:rgba(245,166,35,.08)}.abtn:disabled{opacity:.3}
+.rmb{width:28px;height:28px;border:none;background:#FFF0F0;color:#FF6B6B;border-radius:50%;font-size:.9rem;cursor:pointer;font-weight:700;display:flex;align-items:center;justify-content:center}
+.rmb:hover{background:#FF6B6B;color:white}
+.phs{margin:10px 0 4px}.phl{font-size:.8rem;font-weight:700;color:#8B5E3C;display:block;margin-bottom:6px}
+.phi{display:flex;align-items:center;gap:8px}.phi input[type=file]{flex:1;font-size:.8rem}
+.phi input[type=text]{flex:1;padding:8px 12px;border:2px solid #E8D5C4;border-radius:10px;font-size:.85rem;background:#FFFBF5}
+.phor{font-size:.8rem;color:#aaa;font-weight:700}
+.pv{max-width:200px;height:200px;object-fit:cover;border-radius:14px;margin-top:8px;border:2px solid #f0e0cc;display:none}
+.pv.show{display:block}
+.btn{padding:10px 20px;border:none;border-radius:14px;font-weight:700;font-size:.9rem;cursor:pointer}
+.btn:hover{transform:translateY(-1px)}
+.btn-p{width:100%;background:linear-gradient(135deg,#F5A623,#E8961A);color:white;box-shadow:0 4px 15px rgba(245,166,35,.3);padding:14px}
+.btn-d{background:#FF6B6B;color:white}.btn-s{padding:5px 12px;font-size:.75rem;border-radius:10px}
+.sm{font-size:.85rem;margin-bottom:10px}
+.ar{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid #f0e0cc}
+.ar:last-child{border-bottom:none}.ai{flex:1;min-width:0}
+.an{font-weight:800;font-size:.9rem}.ab{font-size:.78rem;color:#888}
+</style></head><body>
+<div class="container">
+<div class="top-nav">
+  <a href="/dashboard">← Dashboard</a>
+  <a href="#" id="navs">🎉 Slideshow</a>
+  <a href="#" id="navq">QR</a>
+  <a href="#" id="navg">Guess</a>
+</div>
+<div class="card"><h3>🎯 Set Correct Breeds</h3><div class="sm" id="amsg"></div><div id="adogs"></div><button class="btn btn-p" id="sbtn">💾 Save Answers</button></div>
+<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 style="margin-bottom:0">🗑️ Manage Guesses</h3><button class="btn btn-p btn-s" id="rbtn">🔄 Refresh</button></div><div id="glist"></div></div>
+</div></body>
 <script>
-const slug=window.location.pathname.split("/p/")[1]?.split("/")[0];const API=`/api/parties/${slug}`;const token=localStorage.getItem("token");const auth={"Content-Type":"application/json","Authorization":"Bearer "+token};
-["nav-slideshow","nav-qr","nav-guess"].forEach(id=>{const el=document.getElementById(id);el.href=`/p/${slug}/${id.split("-")[1]}`});
-const BREEDS=["","Affenpinscher","Afghan Hound","Airedale Terrier","Akita","Alaskan Malamute","American Bulldog","American Cocker Spaniel","Australian Cattle Dog","Australian Shepherd","Basenji","Basset Hound","Beagle","Bearded Collie","Belgian Malinois","Bernese Mountain Dog","Bichon Frise","Bloodhound","Border Collie","Boston Terrier","Boxer","Brittany","Bulldog","Bullmastiff","Cairn Terrier","Cane Corso","Cavalier King Charles Spaniel","Chihuahua","Chinese Crested","Chow Chow","Cocker Spaniel","Collie","Corgi (Pembroke Welsh)","Corgi (Cardigan Welsh)","Dachshund","Dalmatian","Doberman Pinscher","English Bulldog","English Springer Spaniel","French Bulldog","German Shepherd","German Shorthaired Pointer","Golden Retriever","Gordon Setter","Great Dane","Great Pyrenees","Greyhound","Havanese","Irish Setter","Irish Wolfhound","Italian Greyhound","Jack Russell Terrier","Japanese Chin","Keeshond","Labrador Retriever","Leonberger","Lhasa Apso","Maltese","Mastiff","Miniature Pinscher","Miniature Schnauzer","Newfoundland","Norfolk Terrier","Norwegian Elkhound","Old English Sheepdog","Papillon","Pekingese","Pit Bull Terrier","Pointer","Pomeranian","Poodle","Portuguese Water Dog","Pug","Rhodesian Ridgeback","Rottweiler","Saint Bernard","Saluki","Samoyed","Schipperke","Scottish Terrier","Shar-Pei","Shetland Sheepdog","Shiba Inu","Shih Tzu","Siberian Husky","Silky Terrier","Staffordshire Bull Terrier","Vizsla","Weimaraner","Welsh Springer Spaniel","Welsh Terrier","West Highland White Terrier","Whippet","Wire Fox Terrier","Yorkshire Terrier","Mixed Breed / Mutt","Other"];
-const F=BREEDS.filter(b=>b);const MAX=4;
-function breedSelect(sel){const s=document.createElement("select");s.innerHTML=F.map(b=>`<option value="${b}" ${b===sel?"selected":""}>${b}</option>`).join("");return s}
-function breedRow(i,breed,pct){const d=document.createElement("div");d.className="breed-row";d.innerHTML=`<div class="form-group s-wrap" style="margin-bottom:0"></div><div class="form-group p-wrap" style="margin-bottom:0"><input type="number" class="pct-input" value="${pct||0}" min="0" max="100" placeholder="%"></div>${i>0?'<button class="rm-btn">×</button>':'<span style="width:30px"></span>'}`;d.querySelector(".s-wrap").appendChild(breedSelect(breed||""));const rm=d.querySelector(".rm-btn");if(rm)rm.addEventListener("click",()=>{d.remove();updateTotals()});d.querySelector("select").addEventListener("change",()=>{if(d.closest(".dog-block").querySelectorAll(".breed-row").length===1)autodist(d.closest(".dog-block"));updateTotals()});d.querySelector(".pct-input").addEventListener("input",updateTotals);return d}
-function dogRows(dogBlock){return dogBlock.querySelectorAll(".breed-row").length}
-function collectBlock(dogBlock){return Array.from(dogBlock.querySelectorAll(".breed-row")).map(r=>({breed:r.querySelector("select").value,percentage:parseInt(r.querySelector(".pct-input").value)||0})).filter(b=>b.breed)}
-function autodist(block){const els=block.querySelectorAll(".breed-row");const sel=Array.from(els).filter(r=>r.querySelector("select").value);if(!sel.length)return;const each=Math.floor(100/sel.length),rem=100-each*sel.length;let idx=0;els.forEach(r=>{if(r.querySelector("select").value){r.querySelector(".pct-input").value=each+(idx===0?rem:0);idx++}else{r.querySelector(".pct-input").value=0}});updateTotals()}
-function updateTotals(){document.querySelectorAll(".dog-block").forEach(block=>{const data=collectBlock(block),total=data.reduce((s,b)=>s+b.percentage,0);const pctEl=block.querySelector(".pct-total");const valEl=block.querySelector(".pct-value");const bar=block.querySelector(".pct-bar-fill");if(valEl)valEl.textContent=total+"%";if(bar){bar.style.width=Math.min(total,100)+"%";const good=Math.abs(total-100)<=.5;bar.className="pct-bar-fill "+(good?"good":"bad");pctEl.className="pct-total "+(good?"good":"bad")}})}
-function createDogBlock(dog,i,existing){const block=document.createElement("div");block.className="dog-block";block.dataset.index=i;const name=existing&&existing.name||dog.name||"Dog "+(i+1);block.innerHTML=`<h4>🐶 ${esc(name)}</h4>`;const breeds=existing&&existing.breeds||[];if(breeds.length)breeds.forEach((b,j)=>block.appendChild(breedRow(j,b.breed,b.percentage)));if(dogRows(block)===0)block.appendChild(breedRow(0));block.innerHTML+=`<div class="pct-total"><span>Total:</span><span class="pct-value">0%</span><div class="pct-bar-bg"><div class="pct-bar-fill" style="width:0%"></div></div></div>`;block.innerHTML+=`<div class="photo-section"><label class="photo-label">📸 Photo (optional)</label><div class="photo-inputs"><input type="file" class="photo-file" accept="image/*"><span class="photo-or">or</span><input type="text" class="photo-url" placeholder="Paste image URL..."></div><img class="photo-preview hidden" src="" alt="Preview"></div>`;const addBtn=document.createElement("button");addBtn.className="add-btn";addBtn.textContent="+ Add breed";addBtn.addEventListener("click",()=>{if(dogRows(block)>=MAX)return;block.insertBefore(breedRow(dogRows(block)),addBtn);addBtn.disabled=dogRows(block)>=MAX;autodist(block)});block.appendChild(addBtn);
-if(existing&&existing.image){const pv=block.querySelector(".photo-preview");pv.src=existing.image;pv.classList.remove("hidden")}
-const fi=block.querySelector(".photo-file");fi.addEventListener("change",()=>{const f=fi.files[0];if(!f)return;if(f.size>3*1024*1024){alert("Max 3MB");return}const r=new FileReader();r.onload=()=>{block.dataset.photo=r.result;const pv=block.querySelector(".photo-preview");pv.src=r.result;pv.classList.remove("hidden")};r.readAsDataURL(f)});
-const ui=block.querySelector(".photo-url");ui.addEventListener("input",()=>{const u=ui.value.trim();if(u){block.dataset.photo=u;const pv=block.querySelector(".photo-preview");pv.src=u;pv.classList.remove("hidden")}});
-return block}
-function loadDogs(dogs,answers){const c=document.getElementById("admin-dogs");c.innerHTML="";dogs.forEach((d,i)=>{const ad=answers&&answers.dogs&&answers.dogs[i];const block=createDogBlock(d,i,ad);if(ad&&ad.image)block.dataset.photo=ad.image;c.appendChild(block)});updateTotals()}
-document.getElementById("save-btn").addEventListener("click",async()=>{const blocks=document.querySelectorAll(".dog-block");const dogs=Array.from(blocks).map(b=>{const breeds=collectBlock(b);if(!breeds.length)return null;return{breeds,image:b.dataset.photo||null}});if(dogs.includes(null))return alert("Each dog needs at least one breed");try{const r=await fetch(API+"/answers",{method:"POST",headers:auth,body:JSON.stringify({dogs})});if(!r.ok){alert((await r.json()).error);return}document.getElementById("answers-status").innerHTML='<span style="color:var(--green);font-weight:700">✅ Saved!</span>';setTimeout(()=>document.getElementById("answers-status").innerHTML="",3000)}catch{alert("Failed")}});
-async function loadPanel(){try{const ar=await fetch(API+"/answers",{headers:auth}).then(r=>r.json());const gr=await fetch(API+"/guesses");const gd=await gr.json();loadDogs(gd.dogs||[],ar.answers);loadGuesses()}catch{loadDogs([{name:"Dog 1"}]);loadGuesses()}}
-async function loadGuesses(){const list=document.getElementById("guesses-list");try{const d=await fetch(API+"/guesses").then(r=>r.json());const g=d.guesses||[];if(!g.length){list.innerHTML='<p style="color:#888;text-align:center;padding:10px">No guesses yet.</p>';return}list.innerHTML=g.map(gg=>`<div class="admin-row"><div class="admin-info"><div class="admin-name">${esc(gg.name)}</div><div class="admin-breeds">${(gg.guesses||[]).map((gx,i)=>`Dog ${i+1}: ${gx.join(", ")}`).join(" | ")}</div></div><button class="btn btn-danger btn-small del-btn" data-id="${gg.id}">🗑️</button></div>`).join("");list.querySelectorAll(".del-btn").forEach(b=>b.addEventListener("click",async()=>{if(!confirm("Delete?"))return;await fetch(API+"/guesses/"+b.dataset.id,{method:"DELETE",headers:auth});loadGuesses()}))}catch{list.innerHTML='<p style="color:#888">Could not load.</p>'}}
-document.getElementById("refresh-btn").addEventListener("click",loadGuesses);loadPanel();
-function esc(s){const d=document.createElement("div");d.textContent=s;return d.innerHTML}
-</script></body></html>
+var slug = window.location.pathname.split("/p/")[1].split("/")[0];
+var API = "/api/parties/" + slug;
+var token = localStorage.getItem("token");
+var hdrs = { "Content-Type": "application/json", "Authorization": "Bearer " + token };
+document.getElementById("navs").href = "/p/" + slug + "/slideshow";
+document.getElementById("navq").href = "/p/" + slug + "/qr";
+document.getElementById("navg").href = "/p/" + slug;
+
+var BREEDS = ["","Affenpinscher","Afghan Hound","Airedale Terrier","Akita","Alaskan Malamute","American Bulldog","American Cocker Spaniel","Australian Cattle Dog","Australian Shepherd","Basenji","Basset Hound","Beagle","Bearded Collie","Belgian Malinois","Bernese Mountain Dog","Bichon Frise","Bloodhound","Border Collie","Boston Terrier","Boxer","Brittany","Bulldog","Bullmastiff","Cairn Terrier","Cane Corso","Cavalier King Charles Spaniel","Chihuahua","Chinese Crested","Chow Chow","Cocker Spaniel","Collie","Corgi (Pembroke Welsh)","Corgi (Cardigan Welsh)","Dachshund","Dalmatian","Doberman Pinscher","English Bulldog","English Springer Spaniel","French Bulldog","German Shepherd","German Shorthaired Pointer","Golden Retriever","Gordon Setter","Great Dane","Great Pyrenees","Greyhound","Havanese","Irish Setter","Irish Wolfhound","Italian Greyhound","Jack Russell Terrier","Japanese Chin","Keeshond","Labrador Retriever","Leonberger","Lhasa Apso","Maltese","Mastiff","Miniature Pinscher","Miniature Schnauzer","Newfoundland","Norfolk Terrier","Norwegian Elkhound","Old English Sheepdog","Papillon","Pekingese","Pit Bull Terrier","Pointer","Pomeranian","Poodle","Portuguese Water Dog","Pug","Rhodesian Ridgeback","Rottweiler","Saint Bernard","Saluki","Samoyed","Schipperke","Scottish Terrier","Shar-Pei","Shetland Sheepdog","Shiba Inu","Shih Tzu","Siberian Husky","Silky Terrier","Staffordshire Bull Terrier","Vizsla","Weimaraner","Welsh Springer Spaniel","Welsh Terrier","West Highland White Terrier","Whippet","Wire Fox Terrier","Yorkshire Terrier","Mixed Breed / Mutt","Other"];
+var F = [];
+for (var i = 0; i < BREEDS.length; i++) { if (BREEDS[i]) F.push(BREEDS[i]); }
+var MAX = 4;
+
+function esc(s) { var d = document.createElement("div"); d.textContent = s; return d.innerHTML; }
+
+function bselect(sel) {
+  var s = document.createElement("select");
+  var h = "";
+  for (var i = 0; i < F.length; i++) h += "<option value=\"" + F[i] + "\"" + (F[i] === sel ? " selected" : "") + ">" + F[i] + "</option>";
+  s.innerHTML = h;
+  return s;
+}
+
+function brow(i, breed, pct) {
+  var d = document.createElement("div"); d.className = "br";
+  var sw = document.createElement("div"); sw.className = "fg sw"; sw.style.marginBottom = "0"; sw.appendChild(bselect(breed || ""));
+  var pw = document.createElement("div"); pw.className = "fg pw"; pw.style.marginBottom = "0";
+  var inp = document.createElement("input"); inp.type = "number"; inp.className = "pi"; inp.value = pct || 0; inp.min = 0; inp.max = 100; inp.placeholder = "%";
+  pw.appendChild(inp);
+  d.appendChild(sw); d.appendChild(pw);
+  if (i > 0) { var rm = document.createElement("button"); rm.className = "rmb"; rm.textContent = "×"; rm.onclick = function() { d.remove(); utot(); }; d.appendChild(rm); }
+  else { var sp = document.createElement("span"); sp.style.width = "28px"; sp.style.flexShrink = "0"; d.appendChild(sp); }
+  inp.oninput = utot;
+  s = sw.querySelector("select");
+  s.onchange = function() {
+    var block = d.closest(".dog-block");
+    if (block.querySelectorAll(".br").length === 1) adist(block);
+    utot();
+  };
+  return d;
+}
+
+function drows(block) { return block.querySelectorAll(".br").length; }
+
+function collect(block) {
+  var rows = block.querySelectorAll(".br"); var result = [];
+  for (var i = 0; i < rows.length; i++) {
+    var sel = rows[i].querySelector("select").value;
+    var pct = parseInt(rows[i].querySelector(".pi").value) || 0;
+    if (sel) result.push({ breed: sel, percentage: pct });
+  }
+  return result;
+}
+
+function adist(block) {
+  var rows = block.querySelectorAll(".br"); var sel = [];
+  for (var i = 0; i < rows.length; i++) { if (rows[i].querySelector("select").value) sel.push(i); }
+  if (!sel.length) return;
+  var each = Math.floor(100 / sel.length), rem = 100 - each * sel.length;
+  for (var i = 0; i < sel.length; i++) { rows[sel[i]].querySelector(".pi").value = each + (i === 0 ? rem : 0); }
+  utot();
+}
+
+function utot() {
+  var blocks = document.querySelectorAll(".dog-block");
+  for (var i = 0; i < blocks.length; i++) {
+    var data = collect(blocks[i]), total = 0;
+    for (var j = 0; j < data.length; j++) total += data[j].percentage;
+    var pctEl = blocks[i].querySelector(".pt");
+    var valEl = blocks[i].querySelector(".pv");
+    var bar = blocks[i].querySelector(".pf");
+    var tv = blocks[i].querySelector(".tv");
+    if (tv) tv.textContent = total + "%";
+    if (bar) { bar.style.width = Math.min(total, 100) + "%"; var g = Math.abs(total - 100) < 1; bar.className = "pf " + (g ? "good" : "bad"); pctEl.className = "pt " + (g ? "good" : "bad"); }
+  }
+}
+
+function makedog(dog, i, existing) {
+  var block = document.createElement("div"); block.className = "dog-block"; block.dataset.index = i;
+  var name = (existing && existing.name) || dog.name || ("Dog " + (i + 1));
+  block.innerHTML = "<h4>🐶 " + esc(name) + "</h4>";
+
+  var breeds = (existing && existing.breeds) || [];
+  for (var j = 0; j < breeds.length; j++) block.appendChild(brow(j, breeds[j].breed, breeds[j].percentage));
+  if (drows(block) === 0) block.appendChild(brow(0));
+
+  block.innerHTML += "<div class=\"pt\"><span>Total:</span><span class=\"tv\">0%</span><div class=\"pb\"><div class=\"pf\" style=\"width:0%\"></div></div></div>";
+
+  var ps = document.createElement("div"); ps.className = "phs";
+  ps.innerHTML = "<label class=\"phl\">📸 Photo (optional)</label><div class=\"phi\"><input type=\"file\" class=\"pfile\" accept=\"image/*\"><span class=\"phor\">or</span><input type=\"text\" class=\"purl\" placeholder=\"Paste image URL...\"></div><img class=\"pv\" src=\"\" alt=\"Preview\">";
+  block.appendChild(ps);
+
+  if (existing && existing.image) {
+    var pv = ps.querySelector(".pv"); pv.src = existing.image; pv.classList.add("show");
+    block.dataset.photo = existing.image;
+  }
+
+  var fi = ps.querySelector(".pfile");
+  fi.onchange = function() {
+    var f = fi.files[0]; if (!f) return;
+    if (f.size > 3*1024*1024) { alert("Max 3MB"); return; }
+    var r = new FileReader();
+    r.onload = function() { block.dataset.photo = r.result; var p = ps.querySelector(".pv"); p.src = r.result; p.classList.add("show"); };
+    r.readAsDataURL(f);
+  };
+  var ui = ps.querySelector(".purl");
+  ui.oninput = function() {
+    var u = ui.value.trim();
+    if (u) { block.dataset.photo = u; var p = ps.querySelector(".pv"); p.src = u; p.classList.add("show"); }
+  };
+
+  var ab = document.createElement("button"); ab.className = "abtn"; ab.textContent = "+ Add breed";
+  ab.onclick = function() {
+    if (drows(block) >= MAX) return;
+    block.insertBefore(brow(drows(block)), ab);
+    ab.disabled = drows(block) >= MAX;
+    adist(block);
+  };
+  block.appendChild(ab);
+  return block;
+}
+
+function loaddogs(dogs, answers) {
+  var c = document.getElementById("adogs"); c.innerHTML = "";
+  for (var i = 0; i < dogs.length; i++) {
+    var ex = (answers && answers.dogs && answers.dogs[i]) || null;
+    c.appendChild(makedog(dogs[i], i, ex));
+  }
+  utot();
+}
+
+document.getElementById("sbtn").onclick = function() {
+  var blocks = document.querySelectorAll(".dog-block"); var dogs = [];
+  for (var i = 0; i < blocks.length; i++) {
+    var breeds = collect(blocks[i]);
+    if (!breeds.length) { alert("Each dog needs at least one breed"); return; }
+    dogs.push({ breeds: breeds, image: blocks[i].dataset.photo || null });
+  }
+  fetch(API + "/answers", { method: "POST", headers: hdrs, body: JSON.stringify({ dogs: dogs }) })
+    .then(function(r) { return r.json().then(function(d) { if (!r.ok) throw new Error(d.error); return d; }); })
+    .then(function() {
+      document.getElementById("amsg").innerHTML = "<span style=\"color:" + "#7BC67E" + ";font-weight:700\">✅ Saved!</span>";
+      setTimeout(function() { document.getElementById("amsg").innerHTML = ""; }, 3000);
+    })
+    .catch(function(e) { alert(e.message || "Failed to save"); });
+};
+
+function loadpanel() {
+  var p1 = fetch(API + "/answers", { headers: hdrs }).then(function(r) { return r.json(); }).catch(function() { return {}; });
+  var p2 = fetch(API + "/guesses").then(function(r) { return r.json(); }).catch(function() { return {}; });
+  Promise.all([p1, p2]).then(function(r) {
+    var answers = r[0], gd = r[1];
+    var dogs = gd.dogs || [];
+    if (!dogs.length) dogs = [{ name: "Dog 1" }];
+    loaddogs(dogs, answers.answers);
+    loadguesses();
+  });
+}
+
+function loadguesses() {
+  var list = document.getElementById("glist");
+  fetch(API + "/guesses").then(function(r) { return r.json(); }).then(function(d) {
+    var g = d.guesses || [];
+    if (!g.length) { list.innerHTML = "<p style=\"color:#888;text-align:center;padding:10px\">No guesses yet.</p>"; return; }
+    var h = "";
+    for (var i = 0; i < g.length; i++) {
+      var gg = g[i];
+      var gbreeds = [];
+      for (var j = 0; j < (gg.guesses || []).length; j++) gbreeds.push("Dog " + (j+1) + ": " + gg.guesses[j].join(", "));
+      h += "<div class=\"ar\"><div class=\"ai\"><div class=\"an\">" + esc(gg.name) + "</div><div class=\"ab\">" + esc(gbreeds.join(" | ")) + "</div></div><button class=\"btn btn-d btn-s db\" data-id=\"" + gg.id + "\">🗑️</button></div>";
+    }
+    list.innerHTML = h;
+    var btns = list.querySelectorAll(".db");
+    for (var i = 0; i < btns.length; i++) {
+      btns[i].onclick = function() {
+        if (!confirm("Delete?")) return;
+        fetch(API + "/guesses/" + this.dataset.id, { method: "DELETE", headers: hdrs }).then(function() { loadguesses(); });
+      };
+    }
+  }).catch(function() { list.innerHTML = "<p style=\"color:#888\">Could not load.</p>"; });
+}
+
+document.getElementById("rbtn").onclick = loadguesses;
+loadpanel();
+</script>
+</body></html>
