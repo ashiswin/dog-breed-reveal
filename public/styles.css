@@ -162,7 +162,7 @@ select {
 .dog-section h4 { margin-bottom: var(--s); }
 
 .breed-row { display: flex; align-items: center; gap: 6px; margin-bottom: var(--s); width: 100%; }
-.breed-row .form-group { margin-bottom: 0 !important; width: 100% !important; }
+.breed-row .form-group { margin-bottom: 0 !important; }
 .breed-row .select-col { flex: 1; min-width: 0; }
 .breed-row .pct-col { width: 72px; flex: none; }
 .breed-row select,
@@ -171,8 +171,10 @@ select {
   border-radius: 12px; font-family: var(--font); font-size: 1rem;
   background: var(--bg-light); box-sizing: border-box; width: 100%;
 }
-.breed-row select { padding: 0 34px 0 12px; }
+.breed-row select { padding: 0 14px; }
 .breed-row .pct-input { padding: 0 4px; text-align: center; }
+.breed-row select:focus,
+.breed-row .pct-input:focus { outline: none; border-color: var(--gold); }
 
 .rm-btn {
   width: 28px; height: 28px; border: none; background: #FFF0F0;
