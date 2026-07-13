@@ -79,10 +79,18 @@ app.get("/api/auth/me", authMiddleware, async (req, res) => {
   u ? res.json({ id: u.id, email: u.email, name: u.name }) : res.status(404).json({ error: "Not found" });
 });
 
-// --- Parties ---
+app.get("/api/debug", async (req, res) => {
+  const raw = await db.rawQuery("parties");
+  res.json({ supabase: !!process.env.SUPABASE_URL, parties: raw, jwt: JWT_SECRET.slice(0, 8) + "..." });
+});
+
 app.get("/api/parties", authMiddleware, async (req, res) => {
-  const parties = await db.getPartiesByUser(req.userId);
-  res.json(parties.map(p => ({ id: p.id, slug: p.slug, dogs: p.dogs || [], guessCount: (p.guesses||[]).length, revealed: p.revealed||false, createdAt: p.created_at })));
+  try {
+    const parties = await db.getPartiesByUser(req.userId);
+    res.json(parties.map(p => ({ id: p.id, slug: p.slug, dogs: p.dogs || [], guessCount: (p.guesses||[]).length, revealed: p.revealed||false, createdAt: p.created_at })));
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
 });
 
 app.post("/api/parties", authMiddleware, async (req, res) => {
