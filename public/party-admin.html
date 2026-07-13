@@ -29,8 +29,9 @@ body{font-family:'Nunito',sans-serif;background:#faf5ed;min-height:100vh;color:#
 .pt.bad{color:#FF6B6B}.pt.good{color:#7BC67E}
 .pb{flex:1;height:8px;background:#f0e0cc;border-radius:4px;overflow:hidden}
 .pf{height:100%;border-radius:4px;transition:width .3s}.pf.good{background:#7BC67E}.pf.bad{background:#FF6B6B}
-.abtn{display:inline-flex;align-items:center;gap:4px;padding:6px 14px;background:transparent;border:2px dashed #F5A623;border-radius:20px;font-weight:700;font-size:.8rem;color:#F5A623;cursor:pointer;margin-top:4px}
-.abtn:hover{background:rgba(245,166,35,.08)}.abtn:disabled{opacity:.3}
+.abtn{display:inline-flex;align-items:center;gap:6px;padding:10px 18px;background:transparent;border:2px solid #F5A623;border-radius:14px;font-weight:700;font-size:.9rem;color:#F5A623;cursor:pointer;transition:transform .2s,box-shadow .2s}
+.abtn:hover{transform:translateY(-1px);box-shadow:0 4px 15px rgba(245,166,35,.2)}.abtn:disabled{opacity:.3;cursor:not-allowed}
+.abtn svg{width:16px;height:16px}
 .rmb{width:28px;height:28px;border:none;background:#FFF0F0;color:#FF6B6B;border-radius:50%;font-size:.9rem;cursor:pointer;font-weight:700;display:flex;align-items:center;justify-content:center}
 .rmb:hover{background:#FF6B6B;color:white}
 .phs{margin:10px 0 4px}.phl{font-size:.8rem;font-weight:700;color:#8B5E3C;display:block;margin-bottom:6px}
@@ -198,7 +199,8 @@ function makedog(dog, i, existing) {
     if (u) { block.dataset.photo = u; var p = ps.querySelector(".pv"); p.src = u; p.classList.add("show"); }
   };
 
-  var ab = document.createElement("button"); ab.className = "abtn"; ab.textContent = "+ Add breed";
+  var ab = document.createElement("button"); ab.className = "abtn";
+  ab.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add breed';
   ab.onclick = function() {
     if (drows(block) >= MAX) return;
     block.insertBefore(brow(drows(block)), ab);

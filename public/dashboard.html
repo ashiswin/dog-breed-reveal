@@ -37,8 +37,8 @@ body{font-family:'Nunito',sans-serif;background:#faf5ed;min-height:100vh;color:v
 .dog-row input{flex:1}
 .rm-btn{width:30px;height:30px;border:none;background:#FFF0F0;color:var(--coral);border-radius:50%;font-size:1rem;cursor:pointer;font-weight:700;display:flex;align-items:center;justify-content:center}
 .rm-btn:hover{background:var(--coral);color:white}
-.add-dog-btn{background:transparent;border:2px dashed var(--gold);border-radius:20px;padding:6px 14px;font-weight:700;font-size:.8rem;color:var(--gold);cursor:pointer;margin-top:4px}
-.add-dog-btn:hover{background:rgba(245,166,35,.08)}
+.add-dog-btn{display:inline-flex;align-items:center;gap:6px;padding:10px 18px;background:transparent;border:2px solid #F5A623;border-radius:14px;font-weight:700;font-size:.9rem;color:#F5A623;cursor:pointer;transition:transform .2s;margin-top:4px}
+.add-dog-btn:hover{transform:translateY(-1px);box-shadow:0 4px 15px rgba(245,166,35,.2)}
 .error-msg{color:var(--coral);font-size:.85rem;margin-top:8px;display:none}
 </style>
 </head>
@@ -62,7 +62,7 @@ body{font-family:'Nunito',sans-serif;background:#faf5ed;min-height:100vh;color:v
     <div id="dogNameList">
       <div class="dog-row"><input type="text" class="dog-name" placeholder="Dog name" style="flex:1;"></div>
     </div>
-    <button class="add-dog-btn" onclick="addDogRow()">＋ Add another dog</button>
+    <button class="add-dog-btn" onclick="addDogRow()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Add another dog</button>
   </div>
   <div class="form-group">
     <label>Custom URL Slug (optional)</label>
